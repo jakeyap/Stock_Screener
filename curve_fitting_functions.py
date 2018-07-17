@@ -28,6 +28,69 @@ earnings = logscale x log (year) + logoffset
 import matplotlib.pyplot as plt
 import numpy as np
 
+def plot_earnings(year_arr, earnings_arr, title):
+    '''
+    To create an array with the projections
+    
+    Inputs:
+        year_arr: array of years
+        earnings_arr: array of earnings
+        title: a string to put on the plot
+    Outputs:
+        [year, exp_val, lin_val, log_val] where
+        year:       last year of the projected time period
+        exp_val:    projection using exponential growth model
+        lin_val:    projection using linear growth model
+        log_val:    projection using log growth model
+        
+        A plot with title: title, but is not returned
+    '''
+    
+    plt.figure(title)
+    [log1, log0] = fit_logarithm(year_arr, earnings_arr)
+    [lin1, lin0] = fit_linear(year_arr, earnings_arr)
+    [exp1, exp0] = fit_exponential(year_arr, earnings_arr)
+    
+    ''' Projection of 10 years into the future '''
+    # Create the 10 year projection array first
+    # Create a copy
+    proj_year = year_arr.copy()
+    # Find the last year with valid data
+    last_year = year_arr[len(year_arr)-1]
+    print(last_year)
+    counter = 1
+    while counter <= 10:
+        proj_year.append(last_year + counter)
+        counter = counter + 1
+        
+    y_vals_exp = project_exponential(proj_year, exp1, exp0)
+    y_vals_lin = project_linear(proj_year, lin1, lin0)
+    y_vals_log = project_log(proj_year, log1, log0)
+    
+    exp_label = str('Exponetial: y = %.2e * ( 1 + (%1.3f))**N' %(exp1,exp0-1))
+    lin_label = str('Linear fit: y = %.3e * x + (%.2e)' % (lin1,lin0))
+    log_label = str('Log fit:    y = %.3e * log(x) + %.3e' % (log1, log0))
+
+    plt.plot(year_arr, earnings_arr, marker='x')
+    plt.plot(proj_year, y_vals_exp, linestyle='--', color='green', label=exp_label)
+    plt.plot(proj_year, y_vals_lin, linestyle='-.', color='grey', label=lin_label)
+    plt.plot(proj_year, y_vals_log, linestyle='--', color='red', label=log_label)
+    plt.grid('on')
+    plt.title(title)
+    plt.legend()
+    
+    axes = plt.gca()
+    ylimits = axes.get_ylim()
+    axes.set_ylim([0, ylimits[1]])
+    xlimits = [proj_year[0], proj_year[len(proj_year)-1]]
+    axes.set_xlim(xlimits)
+    xlimits = axes.get_xlim()
+    axes.fill_betweenx([0, ylimits[1]], last_year, xlimits[1], color='green',alpha=0.1)
+    
+    index = len(proj_year) - 1
+    output = [proj_year[index], y_vals_exp[index], y_vals_lin[index], y_vals_log[index]]
+    return output
+
 def fit_exponential(year, earnings):
     """
     Inputs: 
