@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jul 16 22:47:44 2018
-This file contains all the functions to fit curves.
+1. Are earnings predictable? Consistent or growing?   
+    Partly done. Draw regression lines and check for 50% tolerance
+    Need to check slope also
+    
+This file contains all the functions to fit curves and draw projections.
 It has 3 scenarios to model earnings.
 
 Optimistic:  exponential growth
@@ -229,6 +233,10 @@ def earnings_consistency_check(year, earnings_arr, regression_arr):
         else:
             print('Earnings in year %d is OK' % year[counter])
         counter = counter + 1
+    last_earnings = regression_arr[len]
+    first_earnings= regression_arr[0]
+    if first_earnings < last_earnings:
+        consistent = False
     return consistent
     
     

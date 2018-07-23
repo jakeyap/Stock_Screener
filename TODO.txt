@@ -1,32 +1,37 @@
-0. Regex editor to grab data from Morningstar files.
+0. Regex editor to grab data from Morningstar.
+    Download the financial statements first (optional)
+    Regex the following
         year
         absolute earnings
         EPS
         shares count
         Year closing share price
+        Total equity
         Retained earnings
         ST debt & LT debt
-        Total equity
+        When data is found, plot the whole lot out for sanity checking
 
 1. Are earnings predictable? Consistent or growing?   
-        Partly done. Draw regression lines and check for 50% tolerance
-        Need to check slope also
+    Partly done. Draw regression lines and check for 50% tolerance
+    Need to check slope also
 
 2. Determine initial rate of return. 
-        EPS / price
+    EPS / price
 
 3. Determine per share earnings growth rate. 
-        Done using regression. 
-        Now need to use cash flow method (EPS - dividends, compound using ROE)
+    Done using regression. 
+    Now need to use cash flow method (EPS - dividends, compound using ROE)
     
 4. Determine value of company relative to gov bonds
-        
+    
 
 5. Determine the best/worst cases stock price using historical PE
-        
+    
 
 6. Determine annual return compounding rate
-        Use the geometric series formula to figure out growth rate
+    Use the geometric series formula to figure out growth rate
         
 7. Is the company in serious debt? 
-        ( LTDebt + STDebt ) / Equity
+    ( LTDebt + STDebt ) / Equity
+        
+http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=TWTR&reportType=cf&period=12&dataType=A&order=asc&columnYear=10&number=3
