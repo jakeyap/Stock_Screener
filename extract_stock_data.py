@@ -25,19 +25,8 @@ But just go ahead anyway. Signed up for API trial
 
 import requests
 import numpy as np
-
-mainsite = 'http://financials.morningstar.com'
-query = '/ajax/ReportProcess4CSV.html?t='
-company = 'BN4'
-period = '&reportType=is&period=12&dataType=A&'
-order = 'order=asc&columnYear=5&number=1'
-
-url2 = mainsite+query+company+period+order
-r = requests.get(url2, allow_redirects=True)
-'https://morningstar-api.herokuapp.com/analysisData?ticker=GE'
-data_directory = ''
-
-open('test.csv', 'wb').write(r.content)
+import csv
+import re
 
 def download_data(url):
     '''Downloads the raw url object'''
@@ -45,10 +34,37 @@ def download_data(url):
     return r
 
 def write_data2csv(data_directory, filename, data):
-    ''' Writes the object into a csv file. Return a matrix '''
-    '''NOT DONE YET'''
-    open(data_directory+filename, 'wb').write(r.content)
+    ''' Writes the object into a csv file. '''
+    open(data_directory+filename, 'wb').write(data.content)    
     return
+
+def read_csv2data(data_directory, filename):
+    ''' Convert from a csv file into matrix '''
+    csvfile = open(data_directory+filename, 'r')
+    readfile = csv.reader(csvfile)
+    labels = []
+    datalist = []
+    
+    for eachline in readfile:
+        length = len(eachline)
+        if length != 1:
+            # Save the labels
+            labels.append(eachline[0])
+            # Strip away the trailing 12 mth data
+            ''' TO DO: Format the dates and numbers properly'''
+            datarow = np.array(eachline[1:length-1])
+            datalist.append(datarow)
+        data = np.matrix(datalist)
+    return [labels, data]
+
+def remove_dash(string):
+    ''' 
+    The morningstar years may have a -12 appended to mean december
+    Remove it
+    '''
+    year = re.split('-', string)
+    year = int(year[0])
+    return year
 
 def get_income_statement_annual_url(company_code):
     '''Generates the required files to get the necessary financial docs'''
