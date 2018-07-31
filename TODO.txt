@@ -7,7 +7,6 @@
         shares count
         Year closing share price
         Total equity
-        Retained earnings
         ST debt & LT debt
         When data is found, plot the whole lot out for sanity checking
 

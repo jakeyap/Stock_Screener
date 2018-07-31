@@ -2,12 +2,7 @@
 """
 Created on Thu Jul 19 20:57:00 2018
 
-URL reading from morningstar seems a little buggy. 
-Cannot get 10 year data
-But just go ahead anyway. Signed up for API trial 
-
-0. Regex editor to grab data from Morningstar.
-    Download the financial statements first (optional)
+0. Regex editor to grab data from Morningstar CSVs.
     Regex the following
         year
         absolute earnings
@@ -15,29 +10,30 @@ But just go ahead anyway. Signed up for API trial
         shares count
         Year closing share price
         Total equity
-        Retained earnings
         ST debt & LT debt
         When data is found, plot the whole lot out for sanity checking
 
+Need to extract the following
+From balance sheet
+1. year
+2. total current assets
+3. total assets
+4. long term debt
+5. short term debt
+6. total liabilities
+7. total equity
+
+From income statement
+1. Net income available to common shareholders
+2. Earnings per share diluted
+3. 
 
 @author: Yong Keong
 """
 
-import requests
-import numpy as np
 import csv
 import re
 import matplotlib.pyplot as plt
-
-def download_data(url):
-    '''Downloads the raw url object'''
-    r = requests.get(url, allow_redirects=True)
-    return r
-
-def write_data2csv(data_directory, filename, data):
-    ''' Writes the object into a csv file. '''
-    open(data_directory+filename, 'wb').write(data.content)    
-    return
 
 def read_csv2data(data_directory, filename):
     ''' 
@@ -68,10 +64,20 @@ def read_csv2data(data_directory, filename):
                 datalist.append(year_row)
             else:                
                 #datarow = np.array(eachline[1:length-1])
-                floatrow = [float(x) for x in datarow]
+                floatrow = [convert2float(x) for x in datarow]
                 datalist.append(floatrow)
             counter = counter + 1
     return [labels,  datalist]
+
+def convert2float(text):
+    '''
+    Conditional function to convert numbers into floats. 
+    If it has some text, apply float function. Else return 0
+    '''
+    if text=='':
+        return 0
+    else:
+        return float(text)
 
 def fmt_year_list(yearlist):
     ''' 
@@ -92,20 +98,22 @@ def fmt_year(year_string):
     year = int(year[0])
     return year
 
-def plot_all(labels, year, raw_data):
+def plot_all_is(labels, year, raw_data):
     counter = 0
     plt.subplot(5,4,1)
     for eachlabel in labels[1:]:
-        plt.subplot(5,4,1+counter)
+        plt.subplot(5,4,20-counter)
         plt.plot(year, raw_data[counter], marker='x')
         plt.title(eachlabel,size=6)
         plt.grid(True)
         ''' Get the ylimit, then scale it from 0 to such'''
         limits = plt.ylim()
-        if limits[0]<0:
-            newlimit = [-limits[0]*1.2, limits[1]*1.2]
-        else:
+        if limits[0]<0 and limits[1]<0:
+            newlimit = [1.2*limits[0], 0]
+        elif limits[0]>0 and limits[1]>0:
             newlimit = [0, limits[1]*1.2]
+        else:
+            newlimit = [1.2*limits[0], limits[1]*1.2]
         plt.ylim(newlimit)
         axes = plt.gca()
         axes.set_xticks(year)
@@ -115,61 +123,3 @@ def plot_all(labels, year, raw_data):
         plt.subplot(5,4,each)
         axes = plt.gca()
         axes.set_xticklabels(year, rotation = 45)
-
-def get_income_statement_annual_url(company_code):
-    '''Generates the required files to get the necessary financial docs'''
-    [header,footer] = generate_url_skeleton()
-    message = '&reportType=is&period=12&dataType=A&'
-    url = header + company_code + message + footer
-    return url
-
-def get_income_statement_quarter_url(company_code):
-    '''Generates the required files to get the necessary financial docs'''
-    [header,footer] = generate_url_skeleton()
-    message = '&reportType=is&period=3&dataType=A&'
-    url = header + company_code + message + footer
-    return url
-
-def get_balance_sheet_annual_url(company_code):
-    '''Generates the required files to get the necessary financial docs'''
-    [header,footer] = generate_url_skeleton()
-    message = '&reportType=bs&period=12&dataType=A&'
-    url = header + company_code + message + footer
-    return url
-
-def get_balance_sheet_quarter_url(company_code):
-    '''Generates the required files to get the necessary financial docs'''
-    [header,footer] = generate_url_skeleton()
-    message = '&reportType=bs&period=3&dataType=A&'
-    url = header + company_code + message + footer
-    return url
-
-def get_cashflow_annual_url(company_code):
-    '''Generates the required files to get the necessary financial docs'''
-    [header,footer] = generate_url_skeleton()
-    message = '&reportType=cf&period=12&dataType=A&'
-    url = header + company_code + message + footer
-    return url
-
-def get_cashflow_quarter_url(company_code):
-    '''Generates the required files to get the necessary financial docs'''
-    [header,footer] = generate_url_skeleton()
-    message = '&reportType=cf&period=3&dataType=A&'
-    url = header + company_code + message + footer
-    return url
-
-def generate_url_skeleton():
-    '''Generates the header and footers for the csv url'''
-    header = 'http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t='
-    footer = '&dataType=A&order=asc&columnYear=5&number=1'
-    return [header, footer]
-    
-
-'''
-reportType: is = Income Statement, cf = Cash Flow, bs = Balance Sheet
-period: 12 for annual reporting, 3 for quarterly reporting
-dataType: this doesn't seem to change and is always A. R is restated
-order: asc or desc (ascending or descending)
-columnYear: 5 or 10 are the only two values supported
-number: The units of the response data. 1 = None 2 = Thousands 3 = Millions 4 = Billions
-'''
