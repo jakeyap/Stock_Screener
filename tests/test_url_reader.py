@@ -5,32 +5,38 @@ Spyder Editor
 This is a temporary script file.
 """
 import extract_stock_data as ms
+import data_scrapper as downloader
 import matplotlib.pyplot as plt
+import time
 
 company = 'BN4'
+year = '_2018'
 
-bs_url = ms.get_balance_sheet_annual_url(company)
-bs_data = ms.download_data(bs_url)
+bs_url = downloader.get_balance_sheet_annual_url(company)
+raw_bs_data = downloader.download_data(bs_url)
 
-is_url = ms.get_income_statement_annual_url(company)
-is_data = ms.download_data(is_url)
+is_url = downloader.get_income_statement_annual_url(company)
+raw_is_data = downloader.download_data(is_url)
 
-cf_url = ms.get_cashflow_annual_url(company)
-cf_data = ms.download_data(cf_url)
+cf_url = downloader.get_cashflow_annual_url(company)
+raw_cf_data = downloader.download_data(cf_url)
 
-ms.write_data2csv('','BN4_bs_2018.csv', bs_data)
-ms.write_data2csv('','BN4_is_2018.csv', is_data)
-ms.write_data2csv('','BN4_cf_2018.csv', cf_data)
+downloader.write_data2csv('',company+year+'_bs.csv', raw_bs_data)
+time.sleep(1)
+#downloader.write_data2csv('',company+year+'_is.csv', raw_is_data)
+#time.sleep(1)
+#downloader.write_data2csv('',company+year+'_cf.csv', raw_cf_data)
 
-#raw_bs_data = ms.read_csv2data('','BN4_bs_2018.csv')
-"""
-bs_labels = raw_bs_data[0]
-bs_data = raw_bs_data[1]
+#bs_data = ms.read_csv2data('',company+year+'_bs.csv')
+#is_data = ms.read_csv2data('',company+year+'_is.csv')
+'''
+is_labels = is_data[0]
+is_data = is_data[1]
 
-length = len(bs_labels)
-year = bs_data[0]
-samplemetric = bs_data[1]
-ms.plot_all(bs_labels,year,bs_data[1:])
+length = len(is_labels)
+year = is_data[0]
+samplemetric = is_data[1]
+ms.plot_all_is(is_labels,year,is_data[1:])
 
 #year0 = ms.format_year(year[0])
-"""
+'''
