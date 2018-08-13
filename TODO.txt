@@ -1,5 +1,7 @@
 0. Regex editor to grab data from Morningstar.
     Download the financial statements first (optional)
+    Download the prices for USA stocks
+    Download the prices for SG stocks
     Regex the following
         year
         absolute earnings
@@ -34,3 +36,5 @@
     ( LTDebt + STDebt ) / Equity
         
 http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=TWTR&reportType=cf&period=12&dataType=A&order=asc&columnYear=10&number=3
+
+8. To create fake data for step 0 first. Then run steps 1 to 8

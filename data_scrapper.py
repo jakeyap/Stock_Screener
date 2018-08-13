@@ -25,10 +25,14 @@ def write_data2csv(data_directory, filename, data):
     for x in range (0,10):
         datastr = datastr.replace(',,', ',0.0,')
     print(datastr)
-    #datastr = datastr.replace(',\n', ',0,')
-    #open(data_directory+filename, 'wb').write(data.content)    
     open(data_directory+filename, 'w').write(datastr)
     return
+
+def get_key_results_url(company_code):
+    ''' Found another way to get summarized info '''
+    url = ('http://financials.morningstar.com/ajax'+
+    '/exportKR2CSV.html?t='+company_code)
+    return url
 
 def get_income_statement_annual_url(company_code):
     '''Generates the required files to get the necessary financial docs'''
@@ -80,6 +84,7 @@ def generate_url_skeleton():
 
 
 '''
+https://gist.github.com/hahnicity/45323026693cdde6a116 for the guides
 reportType: is = Income Statement, cf = Cash Flow, bs = Balance Sheet
 period: 12 for annual reporting, 3 for quarterly reporting
 dataType: this doesn't seem to change and is always A. R is restated
