@@ -99,31 +99,34 @@ def create_projections(year_arr, earnings_arr, projection_len=10):
         ]
     '''
     # Regression line coefficients
-    [log1, log0] = fit_logarithm(year_arr, earnings_arr)
-    [lin1, lin0] = fit_linear(year_arr, earnings_arr)
-    [exp1, exp0] = fit_exponential(year_arr, earnings_arr)
+    year_arr_offset = np.subtract(year_arr,year_arr[0])
+    [log1, log0] = _fit_logarithm(year_arr_offset, earnings_arr)
+    [lin1, lin0] = _fit_linear(year_arr_offset, earnings_arr)
+    [exp1, exp0] = _fit_exponential(year_arr_offset, earnings_arr)
     
     # Create the 10 year projection array first
     proj_year = year_arr.copy()
+    proj_year_offset = year_arr_offset.copy()
     # Find the last year with valid data
     last_year = year_arr[len(year_arr)-1]
     counter = 1
     while counter <= projection_len:
         proj_year.append(last_year + counter)
         counter = counter + 1
+    proj_year_offset = np.subtract(proj_year.copy(),year_arr[0])
     
     # Create the projected data
-    y_vals_exp = project_exponential(proj_year, exp1, exp0)
-    y_vals_lin = project_linear(proj_year, lin1, lin0)
-    y_vals_log = project_log(proj_year, log1, log0)
-    exp_label = str('Exponetial: y = %.2e * ( 1 + (%1.3f))**N' %(exp1,exp0-1))
+    y_vals_exp = _project_exponential(proj_year_offset, exp1, exp0)
+    y_vals_lin = _project_linear(proj_year_offset, lin1, lin0)
+    y_vals_log = _project_log(proj_year_offset, log1, log0)
+    exp_label = str('Exponetial: y = %.2e * ( 1 + (%1.3f))**(N-%d)' %(exp1,exp0-1,proj_year[0]))
     lin_label = str('Linear fit: y = %.3e * x + (%.2e)' % (lin1,lin0))
     log_label = str('Log fit:    y = %.3e * log(x) + %.3e' % (log1, log0))
     
     return [proj_year,y_vals_exp, y_vals_lin, y_vals_log, exp_label, lin_label, log_label]
 
 
-def fit_exponential(year, earnings):
+def _fit_exponential(year, earnings):
     """
     Inputs: 
         year (an array)
@@ -150,7 +153,7 @@ def fit_exponential(year, earnings):
     B = 10**ans1
     return [A,B]
 
-def fit_linear(year, earnings):
+def _fit_linear(year, earnings):
     """
     Inputs: 
         year (an array)
@@ -162,7 +165,7 @@ def fit_linear(year, earnings):
     [gradient, intercept] = np.polyfit((year), earnings, 1)    
     return [gradient, intercept]
 
-def fit_logarithm(year, earnings):
+def _fit_logarithm(year, earnings):
     """
     LOG GROWTH MODEL
     earnings = logscale x log (year) + logoffset
@@ -179,7 +182,7 @@ def fit_logarithm(year, earnings):
     [logscale, logoffset] = np.polyfit(np.log10(year_rescaled), earnings,1)
     return [logscale, logoffset]
 
-def project_linear(proj_year, gradient, intercept):
+def _project_linear(proj_year, gradient, intercept):
     '''
     Inputs: 
         proj_year: years for prediction
@@ -192,7 +195,7 @@ def project_linear(proj_year, gradient, intercept):
     
     return proj_lin
 
-def project_log(proj_year, logscale, logoffset):
+def _project_log(proj_year, logscale, logoffset):
     '''
     Inputs: 
         proj_year: years for prediction
@@ -209,7 +212,7 @@ def project_log(proj_year, logscale, logoffset):
     proj_log = np.add(temp1,logoffset)
     return proj_log
 
-def project_exponential(proj_year, A, B):
+def _project_exponential(proj_year, A, B):
     '''
     Inputs: 
         proj_year: years for prediction
