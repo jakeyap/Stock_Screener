@@ -4,12 +4,18 @@
     Download the prices for SG stocks
     Regex the following
         year
-        absolute earnings
+        Net income
         EPS
-        shares count
-        Year closing share price
+        BVPS
+        FCFPS
+        Dividends
+        Shares count
+        
+        As a % of book value,
         Total equity
-        ST debt & LT debt
+        ST debt
+        LT debt
+        Year closing share price
         When data is found, plot the whole lot out for sanity checking
 
 1. Are earnings predictable? Consistent or growing?   
@@ -37,4 +43,10 @@
         
 http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=TWTR&reportType=cf&period=12&dataType=A&order=asc&columnYear=10&number=3
 
-8. To create fake data for step 0 first. Then run steps 1 to 8
+20180813:   To create sample data for step 0 first. Then run steps 1 to 8. 
+20180814:   Done for YZJ and Keppel. 
+TODO:
+    Include DBS and Visa. Copy over proper headers in the data
+    Change
+    Include EOY exchange rates to SGD
+    

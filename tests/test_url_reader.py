@@ -9,7 +9,7 @@ import data_scrapper as downloader
 import matplotlib.pyplot as plt
 import time
 
-company = 'BS6'
+company = 'V'
 year = '_2018'
 """
 bs_url = downloader.get_balance_sheet_annual_url(company)

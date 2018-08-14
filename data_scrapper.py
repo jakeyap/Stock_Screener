@@ -31,7 +31,8 @@ def write_data2csv(data_directory, filename, data):
 def get_key_results_url(company_code):
     ''' Found another way to get summarized info '''
     url = ('http://financials.morningstar.com/ajax'+
-    '/exportKR2CSV.html?t='+company_code)
+    '/exportKR2CSV.html?t='+company_code+
+    '&region=SGP')
     return url
 
 def get_income_statement_annual_url(company_code):
