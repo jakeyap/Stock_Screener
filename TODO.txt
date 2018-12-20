@@ -50,3 +50,57 @@ TODO:
     Change
     Include EOY exchange rates to SGD
     
+======================
+2018 December 19th
+Here is the plan. Conceptually, here's what I want to do
+1. Grab data from MS into a CSV file.
+2. Extract the strings of what to plot
+3. Extract the numbers to plot
+4. Plot the financials
+5. Visually inspect the numbers and decide on sensible ones
+6. Generate predicted numbers
+7. Do a DCF to calculate present value
+
+
+1. 
+INPUT: MS URL of company financials, company name and year
+OUTPUT: CSV file dumped into folder called company name + year
+
+2.
+INPUT: CSV file and company name + year
+OUTPUT: list of strings
+
+3. 
+INPUT: CSV file and company name + year
+OUTPUT: list of lists of financials
+
+4.
+INPUT: list of strings and list of (lists of financials)
+OUTPUT: None. Prints plots, save to folder
+
+5.
+INPUT: MANUAL step. Observe plots and guess numbers
+OUTPUT: List of numbers. (Dividend tax, PE, ROE, payout ratio, discount rate)
+
+6.
+INPUT: List of guessed numbers, list of strings, list of (list of financials)
+OUTPUT: Present value
+
+I have difficulty trying to rip out Morningstar PE ratios data.
+Therefore, let's just assume the data has been formatted in a way I want.
+To not get stuck in steps 1-3, create a test file to generate hardcoded test data first
+Proceed with step 4 onwards with the fake data
+
+Fake data needed.
+Year
+ROE
+FCF
+EPS
+Dividends
+Payout ratio
+BVPS
+number of shares
+PE ratio
+
+DONE WITH GENERATING FAKE DATA (generate_test_data.py)
+Next: Create nice plots overlaying one another in the window
