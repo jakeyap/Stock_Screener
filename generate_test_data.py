@@ -27,6 +27,7 @@ def generate():
     bookvalue = [0,8.27,9.06,9.91,9.82,10.63,11.05,11.78,11.27,11.3,12.15]
     numberofshares = [3076,3036,2956,2828,2712,2624,2523,2457,2414,2395,2345]
     pe_ratio = [58.1,25.9,16.7,19.7,42.2,29.3,30.4,30,31.4,40.7,34]
+    pb_ratio = [58.1,25.9,16.7,19.7,42.2,29.3,30.4,30,31.4,40.7,34]
     
     datadictionary = {'year':year, 
                    'roe':roe,
@@ -36,6 +37,7 @@ def generate():
                    'payout_ratio':payout_ratio,
                    'bookvalue':bookvalue,
                    'numberofshares':numberofshares,
-                   'pe_ratio':pe_ratio}
+                   'pe_ratio':pe_ratio,
+                   'pb_ratio':pb_ratio}
     
     return datadictionary

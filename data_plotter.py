@@ -16,6 +16,7 @@ Important things to plot are:
    'bookvalue':bookvalue,
    'numberofshares':numberofshares,
    'pe_ratio':pe_ratio
+   'pb_ratio':pb_ratio
    
 @author: Yong Keong
 """
@@ -31,9 +32,10 @@ def plot_data(year_arr, data, title, folder):
     
 def plot_full_dataset(data, title='', folder=''):
    year = data['year']
-   
-   plt.figure(title)
    plt.figure(figsize=(12,9))
+   plt.suptitle(title)
+   plt.rcParams.update({'font.size': 7})
+   
    eps = data['eps']
    roe = data['roe']
    payout_ratio = data['payout_ratio']
@@ -42,51 +44,39 @@ def plot_full_dataset(data, title='', folder=''):
    numberofshares = data['numberofshares']
    fcfps = data['fcfps']
    pe_ratio = data['pe_ratio']
+   pb_ratio = data['pb_ratio']
    
-   plt.subplot(3,3,1)
-   plt.title('Blue: EPS, red: div')
+   plt.subplot(2,3,1)
+   plt.title('Blue: EPS, red: div, green: FCFPS')
    plt.plot(year, eps, color='blue')
    plt.plot(year, dividend, color='red')
+   plt.plot(year, fcfps, color='green')
    plt.grid(True)
    
-   plt.subplot(3,3,2)
-   plt.title('Payout ratio')
-   plt.plot(year, payout_ratio)
+   plt.subplot(2,3,4)
+   plt.title('Blue: Payout ratio, red: ROE')
+   plt.plot(year, payout_ratio, color='blue')
+   plt.plot(year, roe, color='red')
    plt.grid(True)
    
-   plt.subplot(3,3,3)
-   plt.title('ROE')
-   plt.plot(year, roe)
-   plt.grid(True)
-   
-   plt.subplot(3,3,4)
-   plt.title('BVPS')
-   plt.plot(year, bookvalue)
-   plt.grid(True)
-   
-   plt.subplot(3,3,5)
+   plt.subplot(2,3,3)
    plt.title('Shares')
    plt.plot(year, numberofshares)
    plt.grid(True)
    
-   plt.subplot(3,3,6)
-   plt.title('FCFPS')
-   plt.plot(year, fcfps)
+   plt.subplot(2,3,2)
+   plt.title('BVPS')
+   plt.plot(year, bookvalue)
    plt.grid(True)
    
-   plt.subplot(3,3,7)
-   plt.title('PE')
+   plt.subplot(2,3,5)
+   plt.title('PE ratio')
    plt.plot(year, pe_ratio)
    plt.grid(True)
    
-   plt.subplot(3,3,8)
-   plt.title('')
-   #plt.plot(year, )
-   plt.grid(True)
-   
-   plt.subplot(3,3,9)
-   plt.title('')
-   #plt.plot(year, )
+   plt.subplot(2,3,6)
+   plt.title('PB ratio')
+   plt.plot(year, pb_ratio)
    plt.grid(True)
    
    plt.savefig(folder+title+'.png')
