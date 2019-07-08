@@ -30,7 +30,15 @@ def plot_data(year_arr, data, title, folder):
     #plt.savefig('C:/Users/Yong Keong/Documents/GitHub/Stock_Screener/'+folder+title+'.png')
     plt.savefig(folder+title+'.png')
     
-def plot_full_dataset(data, title='', folder=''):
+def plot_full_dataset(data, title='', directory='', projectionyear=0):
+   '''
+   Function to plot out the whole dictionary of stats
+   Arguments:
+      data: dictionary of company stats
+      title: title of plots
+      directory: folder to save the plots in
+      projectionyear: where to start shading from. if 0, dont shade
+   '''
    year = data['year']
    plt.figure(figsize=(12,9))
    plt.suptitle(title)
@@ -45,6 +53,12 @@ def plot_full_dataset(data, title='', folder=''):
    fcfps = data['fcfps']
    pe_ratio = data['pe_ratio']
    pb_ratio = data['pb_ratio']
+   
+   stockprice = []
+   counter = 0
+   while counter < len(year):
+      stockprice.append(pe_ratio[counter] * eps[counter])
+      counter = counter + 1
    
    plt.subplot(2,3,1)
    plt.title('Blue: EPS, red: div, green: FCFPS')
@@ -65,8 +79,9 @@ def plot_full_dataset(data, title='', folder=''):
    plt.grid(True)
    
    plt.subplot(2,3,2)
-   plt.title('BVPS')
-   plt.plot(year, bookvalue)
+   plt.title('Blue:BVPS, red: stock')
+   plt.plot(year, bookvalue,color='blue')
+   plt.plot(year, stockprice,color='red')
    plt.grid(True)
    
    plt.subplot(2,3,5)
@@ -79,4 +94,24 @@ def plot_full_dataset(data, title='', folder=''):
    plt.plot(year, pb_ratio)
    plt.grid(True)
    
-   plt.savefig(folder+title+'.png')
+   shade_projections(projectionyear);
+   
+   plt.savefig(directory+title+'.png')
+   
+
+def shade_projections(year):
+   '''
+   Function to shade the projection area
+   '''
+   if (year == 0):
+      pass
+   else:
+      for index in range(1,7):
+         plt.subplot(2,3,index)
+         axes = plt.gca()
+         ylimits = axes.get_ylim()
+         xlimits = axes.get_xlim()
+         axes.fill_betweenx(ylimits, year, xlimits[1], color='green',alpha=0.1)
+         axes.set_ylim([ylimits[0], ylimits[1]])
+         axes.set_xlim([xlimits[0], xlimits[1]])
+   return

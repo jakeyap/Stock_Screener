@@ -104,3 +104,11 @@ PE ratio
 
 DONE WITH GENERATING FAKE DATA (generate_test_data.py)
 Next: Create nice plots overlaying one another in the window
+
+======================
+2019 July 8th
+Used dictionaries to store the data instead of lists. More portable.
+
+Done extracting data from a csv
+Done generating some sample fake data
+Done doing the cash flow projections

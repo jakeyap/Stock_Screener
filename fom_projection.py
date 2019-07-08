@@ -40,7 +40,7 @@ def modify_dataset_one_year_simple(data, predicted_stats):
    new_data = copy.deepcopy(data)
    # append year
    last_year = new_data['year'][-1] + 1 # access last element and add 1
-   new_data['year'].append(last_year)
+   new_data['year'].append(int(last_year))
    
    # pad ROE
    new_data['roe'].append(expected_roe)
@@ -96,3 +96,65 @@ def modify_dataset_multi_year(data, predicted_stats, years=10):
       data_copy = modify_dataset_one_year_simple(data_old, predicted_stats)
       data_old = data_copy
    return data_copy
+
+def dcf_core(cashflowlist, discount_rate=5):
+   '''
+   A function to backcalculate the present value of a cashflow
+   Arguments: 
+      cashflowlist: list of cashflows
+   '''
+   discount_factor = 1 + (discount_rate / 100)
+   length = len(cashflowlist)
+   pv = 0
+   counter = 0
+   while (counter < length):
+      pv = pv + (cashflowlist[counter] / discount_factor**counter)
+      counter = counter + 1
+   return pv
+
+def estimate_final_stock_price(data):
+   '''
+   A function to get the final stock price when selling
+   Arguments:
+      data: dictionary to store everything
+   Returns:
+      stockprice: float for stock price at the end based on PE
+   '''
+   pe_ratio = data['pe_ratio']
+   eps = data['eps']
+   return pe_ratio[-1] * eps[-1]
+
+def get_cashflow_list(year, data):
+   '''
+   Function to get the cashflows starting from this year 
+   Arguments:
+      year: an integer of when you want to put in money to buy
+      data: dictionary
+   Returns a list of cashflows starting from input year
+   '''
+   year_list = data['year']
+   # find the index of the year
+   index = year_list.index(year)
+   temp_list = data['dividend']
+   dividend_list = temp_list.copy()
+   dividend_list = dividend_list[index:]
+   print(year_list[index:])
+   print(data['eps'][index:])
+   return dividend_list
+
+def dcf_calculator(year, data, discount_rate=5):
+   '''
+   Calculates the present value of a stock 
+   Assumes some dividends and selling price at the end
+   
+   Arguments: 
+      year: integer of the current year
+      data: dictionary of real and predicted values
+      discount rate: % discount rate for DCF
+   '''
+   dividends = get_cashflow_list(year,data)
+   finalstockprice = estimate_final_stock_price(data)
+   
+   # Need to include the selling price at the end
+   dividends[-1] = dividends[-1] + finalstockprice
+   return dcf_core(cashflowlist = dividends, discount_rate = discount_rate)
