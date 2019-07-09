@@ -108,9 +108,11 @@ def dcf_core(cashflowlist, discount_rate=5):
    pv = 0
    counter = 0
    while (counter < length):
-      pv = pv + (cashflowlist[counter] / discount_factor**counter)
+      denom = discount_factor**(counter+1)
+      numer = cashflowlist[counter]
+      pv = pv + (numer / denom)
       counter = counter + 1
-   return pv
+   return round(pv,3)
 
 def estimate_final_stock_price(data):
    '''
@@ -138,8 +140,6 @@ def get_cashflow_list(year, data):
    temp_list = data['dividend']
    dividend_list = temp_list.copy()
    dividend_list = dividend_list[index:]
-   print(year_list[index:])
-   print(data['eps'][index:])
    return dividend_list
 
 def dcf_calculator(year, data, discount_rate=5):
@@ -151,10 +151,12 @@ def dcf_calculator(year, data, discount_rate=5):
       year: integer of the current year
       data: dictionary of real and predicted values
       discount rate: % discount rate for DCF
+   Returns: 
+      a number, present value
    '''
    dividends = get_cashflow_list(year,data)
    finalstockprice = estimate_final_stock_price(data)
-   
+   print(finalstockprice)
    # Need to include the selling price at the end
    dividends[-1] = dividends[-1] + finalstockprice
    return dcf_core(cashflowlist = dividends, discount_rate = discount_rate)

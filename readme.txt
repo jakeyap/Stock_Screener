@@ -1,5 +1,5 @@
 ================================================
-Author: Yap Yong Keong                  Date: 20180716
+Author: Yap Yong Keong                  Date: 2018 Jul 16
 This folder is a project to try my hand at implementing a stock screener.
 The end goal is simple.
 To try to put in a table of stock financial data such as 
@@ -19,3 +19,25 @@ So in our first file, we will do some regression on earnings.
 We will do regression on total earnings & EPS. Will predict earnings 10Y from now
 ================================================
 
+Author: Yap Yong Keong                  Date: 2019 Jul 8
+Changed the approach so far. Not doing regression on earnings anymore.
+Instead, plot past data of 
+   EPS
+   ROE
+   PE_ratio
+   PB_ratio
+   free cash flow per share (fcfps)
+   dividend
+   numberofshares
+   payout_ratio
+
+Using the historical ROE averages, use it to estimate future book value.
+
+1. Estimate EPS_1 = (avg ROE) x bookvalue_0
+2. Estimate dividends_1 = EPS_1 x (avg payout_ratio)
+3. Estimate bookvalue_1 = (EPS_1 - div_1) + bookvalue_0
+4. Estimate stockprice_1 = EPS_1 x (avg PE)
+
+Iterate for some number of years, usually 5
+So far, the steps to grab raw data is manual download from Morningstar
+Copy the row/cols manually into a clean format.

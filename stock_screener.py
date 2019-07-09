@@ -12,39 +12,95 @@ import extract_stock_data as extractor
 
 estimated_roe = 15
 estimated_pe = 25
+estimated_payout_ratio = 0
 dcf_rate = 10
 currentyear = 2019
+years2project = 10
+sampletitle = 'Google 2019'
+directory = 'sample_data/'
+filename = 'Google_2019_condensed.csv'
 
-fakedata = False
 
-if fakedata:
-   data = generate_test_data.generate()
-else:
-   directory = 'sample_data/'
-   filename = 'Google_2019_condensed.csv'
-   data = extractor.read_csv2data(directory, filename)
+def analyze_data(directory='', filename='', title='test company'):
+   '''
+   A wrapper function to generate summarized stock stats and show it graphically
+   Arguments:
+      directory: the raw file directory
+      filename: uh huh
+      title: string to be saved into the plot
+   Returns: [stats, data]
+      stats: a dictionary containing _min _max _avg _std of roe pe_ratio payout_ratio pb_ratio 
+      data: a dictionary of the whole stock data
+   '''
+   if (filename==''): # no filename given, use generated fake data
+      data = generate_test_data.generate()
+   else:
+      data = extractor.read_csv2data(directory, filename)
 
-directory = directory + 'generated_plots/'
-plotter.plot_full_dataset(title='testcompany old',data=data,directory=directory)
-print('Finding stats')
-stock_stats = analyser.analyze_all_data(data,showstats=True)
+   # Show the min, max, avg, std of the PE, PB, ROE, payout_ratio
+   print('Showing stats')
+   stock_stats = analyser.analyze_all_data(data,showstats=True)
+   
+   hist_roe = stock_stats['roe_avg']
+   hist_pe = stock_stats['pe_ratio_avg']
+   stringtoprint = 'Historical ROE mean: '+str(round(hist_roe,2)) + '\n'
+   stringtoprint = stringtoprint + 'Historical PE mean: '+str(round(hist_pe,2))
+   # Plot the old data, save it
+   plotter.plot_full_dataset(title=title+' data', directory=directory, data=data,annotate_string=stringtoprint)
+   return [data, stock_stats]
+   
+def modify_stock_stats(stock_stats, est_roe=None, est_pe=None, est_payout_ratio=None):
+   '''
+   A function to manually change the ROE, PE, payout ratios to generate predictions
+   Arguments: 
+      stock_stats: a dictionary containing 
+            _min 
+            _max 
+            _avg 
+            _std of roe pe_ratio payout_ratio pb_ratio 
+   Retuns the same dictionary reference
+   '''
+   if (est_roe is not None):
+      stock_stats['roe_avg'] = est_roe
+   if (est_pe is not None):
+      stock_stats['pe_ratio_avg'] = est_pe
+   if (est_payout_ratio is not None):
+      stock_stats['payout_ratio_avg'] = est_payout_ratio
+   return stock_stats
 
-'''
-At this point, manually look at the stats, then tune ROE, payoutratio, PE to imagine scenarios project data
-need to calculate the DCF into today
-'''
-
-stock_stats['roe_avg'] = estimated_roe
-stock_stats['pe_ratio_avg'] = estimated_pe
-# stock_stats['payout_ratio_avg'] = 
-new_data = predictor.modify_dataset_multi_year(data=data, predicted_stats=stock_stats, years=10)
-plotter.plot_full_dataset(title='Google predictions',data=new_data, directory=directory, projectionyear=2019)
-
-print('Long term ROE: ' + str(estimated_roe))
-print('Estimated PE:  ' + str(estimated_pe))
-print('Discount rate: ' + str(dcf_rate) + '%')
-
-print('Estimated present value:')
-print(predictor.dcf_calculator(year=currentyear,
-                               data=new_data,
-                               discount_rate=dcf_rate))
+def project_data(data, stock_stats, projectionyear=2019, years2project=5, title='test company'):
+   '''
+   A wrapper function to do prediction of a stock N number of years later
+   '''
+   new_data = predictor.modify_dataset_multi_year(data=data, predicted_stats=stock_stats, years=years2project)
+   presentvalue = predictor.dcf_calculator(year=currentyear,
+                                  data=new_data,
+                                  discount_rate=dcf_rate)
+   
+   stringtoprint = 'Long term ROE: ' + str(estimated_roe) +'\n'
+   stringtoprint = stringtoprint + 'Estimated PE:  ' + str(estimated_pe) + '\n'
+   stringtoprint = stringtoprint + 'Discount rate: ' + str(dcf_rate) + '%\n'
+   stringtoprint = stringtoprint + 'Present value: '+str(presentvalue)
+   
+   plotter.plot_full_dataset(title=title+' predictions',
+                             data=new_data, 
+                             directory=directory, 
+                             projectionyear=projectionyear,
+                             annotate_string=stringtoprint)
+   print(stringtoprint)
+   return
+   
+if __name__ == "__main__":
+   # analyze data
+   [data, stats] = analyze_data(directory=directory, filename=filename, title=sampletitle)
+   # plug in some conservative estimates
+   stats = modify_stock_stats(stock_stats=stats,
+                      est_roe=estimated_roe,
+                      est_pe=estimated_pe,
+                      est_payout_ratio=estimated_payout_ratio)
+   project_data(data=data, 
+                stock_stats=stats,
+                projectionyear=currentyear,
+                years2project=years2project,
+                title=sampletitle)
+   

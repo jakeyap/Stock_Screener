@@ -22,7 +22,7 @@ Important things to plot are:
 """
 
 import matplotlib.pyplot as plt
-
+import matplotlib.ticker as ticker
 
 def plot_data(year_arr, data, title, folder):
     plt.plot(year_arr, data)
@@ -30,7 +30,7 @@ def plot_data(year_arr, data, title, folder):
     #plt.savefig('C:/Users/Yong Keong/Documents/GitHub/Stock_Screener/'+folder+title+'.png')
     plt.savefig(folder+title+'.png')
     
-def plot_full_dataset(data, title='', directory='', projectionyear=0):
+def plot_full_dataset(data, title='', directory='', projectionyear=0, annotate_string=None):
    '''
    Function to plot out the whole dictionary of stats
    Arguments:
@@ -38,10 +38,14 @@ def plot_full_dataset(data, title='', directory='', projectionyear=0):
       title: title of plots
       directory: folder to save the plots in
       projectionyear: where to start shading from. if 0, dont shade
+      annotate_data: for plugging in the dictionary of roe, pe
    '''
+   # define place to store plots
+   plot_directory = directory + 'generated_plots/'
+   
    year = data['year']
    plt.figure(figsize=(12,9))
-   plt.suptitle(title)
+   plt.suptitle(title,size=12)
    plt.rcParams.update({'font.size': 7})
    
    eps = data['eps']
@@ -60,55 +64,68 @@ def plot_full_dataset(data, title='', directory='', projectionyear=0):
       stockprice.append(pe_ratio[counter] * eps[counter])
       counter = counter + 1
    
-   plt.subplot(2,3,1)
+   plot1 = plt.subplot(2,3,1)
    plt.title('Blue: EPS, red: div, green: FCFPS')
    plt.plot(year, eps, color='blue')
    plt.plot(year, dividend, color='red')
    plt.plot(year, fcfps, color='green')
-   plt.grid(True)
    
-   plt.subplot(2,3,4)
+   plot2 = plt.subplot(2,3,4)
    plt.title('Blue: Payout ratio, red: ROE')
    plt.plot(year, payout_ratio, color='blue')
    plt.plot(year, roe, color='red')
-   plt.grid(True)
    
-   plt.subplot(2,3,3)
+   plot3 = plt.subplot(2,3,3)
    plt.title('Shares')
    plt.plot(year, numberofshares)
-   plt.grid(True)
    
-   plt.subplot(2,3,2)
+   plot4 = plt.subplot(2,3,2)
    plt.title('Blue:BVPS, red: stock')
    plt.plot(year, bookvalue,color='blue')
    plt.plot(year, stockprice,color='red')
-   plt.grid(True)
    
-   plt.subplot(2,3,5)
-   plt.title('PE ratio')
-   plt.plot(year, pe_ratio)
-   plt.grid(True)
+   plot5 = plt.subplot(2,3,5)
+   plt.title('Blue: PB, red: PE')
+   plt.plot(year, pe_ratio, color='red')
+   plt.plot(year, pb_ratio, color='blue')
    
    plt.subplot(2,3,6)
-   plt.title('PB ratio')
-   plt.plot(year, pb_ratio)
-   plt.grid(True)
+   plt.ylim([0,1])
+   plt.xlim([0,1])
+   annotate_graph(annotate_string)
    
-   shade_projections(projectionyear);
+   plotlist = [plot1, plot2, plot3, plot4, plot5]
+   for eachplot in plotlist:
+      axes = eachplot.axes
+      axes.grid(True)
+      yearbase = round(len(year) / 10)
+      axes.xaxis.set_major_locator(ticker.IndexLocator(base=yearbase, offset=0))
    
-   plt.savefig(directory+title+'.png')
+   shade_projections(plotlist, projectionyear);
    
+   plt.savefig(plot_directory+title+'.png')
+      
+def annotate_graph(annotate_string):
+   if (annotate_string is None):
+      return
+   else:
+      axes = plt.gca()
+      ylimits = axes.get_ylim()
+      xlimits = axes.get_xlim()
+      xplace = 0.5 * (xlimits[1] - xlimits[0]) + xlimits[0]
+      yplace = 0.5 * (ylimits[1] - ylimits[0]) + ylimits[0]
+      plt.annotate(annotate_string, xy=(xplace,yplace),size=13,ha='center',va='center')
+      return
 
-def shade_projections(year):
+def shade_projections(plotlist, year):
    '''
    Function to shade the projection area
    '''
    if (year == 0):
       pass
    else:
-      for index in range(1,7):
-         plt.subplot(2,3,index)
-         axes = plt.gca()
+      for each in plotlist:
+         axes = each.axes
          ylimits = axes.get_ylim()
          xlimits = axes.get_xlim()
          axes.fill_betweenx(ylimits, year, xlimits[1], color='green',alpha=0.1)
