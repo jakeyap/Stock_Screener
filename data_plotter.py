@@ -2,7 +2,8 @@
 """
 Created on Wed Dec 19 21:58:14 2018
 
-This file is just for plotting the data out nicely
+This file is just for plotting the data out nicely. 
+It takes in a summarized data dictionary.
 
 Important things to plot are:
 

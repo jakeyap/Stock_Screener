@@ -1,0 +1,42 @@
+================================================
+Author: Yap Yong Keong                  Date: 2019 Jul 9
+
+Implement tool to grab data automatically from the raw morningstar csv files.
+
+================================================
+Author: Yap Yong Keong                  Date: 2019 Jul 8
+
+Using the historical ROE averages, use it to estimate future book value.
+1. Estimate EPS_1 = (avg ROE) x bookvalue_0
+2. Estimate dividends_1 = EPS_1 x (avg payout_ratio)
+3. Estimate bookvalue_1 = (EPS_1 - div_1) + bookvalue_0
+4. Estimate stockprice_1 = EPS_1 x (avg PE)
+
+Iterate for some number of years, usually 5
+So far, the steps to grab raw data is manual download from Morningstar
+Copy the row/cols manually into a clean format.
+================================================
+Author: Yap Yong Keong                  Date: 2019 Jul 7
+
+Morningstar's api is no longer working. Change the approach to manual.
+Changed the approach so far. Not doing regression on earnings anymore.
+Instead, plot past data of 
+   EPS        ROE
+   PE_ratio   PB_ratio
+   free cash flow per share (fcfps)
+   dividend   numberofshares
+   payout_ratio
+================================================
+Author: Yap Yong Keong                  Date: 2018 Jul 16
+This project is for implementing a stock analysis tool.
+
+The book titled Buffetology by Mary Buffet describes an algorithm.
+    1. Check if earnings predictable. Consistent or growing.
+    2. Determine initial rate of return from the PE ratio
+    3. Determine per share earnings growth rate
+    4. Determine value of company relative to gov bonds
+    5. Determine the best/worst cases stock price using historical PE
+    6. Determine annual return compounding rate
+    7. Is the company in serious debt? ( LTDebt + STDebt ) / Equity
+    
+We will do regression on total earnings & EPS. Will predict earnings 10Y from now
