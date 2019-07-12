@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jul 31 21:09:59 2018
+Created on Fri Jul 12 11:36:21 2019
 
 @author: Yong Keong
 """
+
 import generate_test_data
 import data_plotter as plotter
 import fom_estimation as analyser
@@ -91,19 +92,3 @@ def project_data(data, stock_stats, projectionyear=2019, years2project=5, title=
                              annotate_string=stringtoprint)
    print(stringtoprint)
    return
-   
-if __name__ == "__main__":
-   # analyze data
-   [data, stats] = analyze_data(directory=directory, filename=filename, title=sampletitle)
-   # plug in some conservative estimates
-   stats = modify_stock_stats(stock_stats=stats,
-                      est_roe=estimated_roe,
-                      est_pe=estimated_pe,
-                      est_payout_ratio=estimated_payout_ratio)
-   
-   project_data(data=data, 
-                stock_stats=stats,
-                projectionyear=currentyear,
-                years2project=years2project,
-                title=sampletitle)
-   

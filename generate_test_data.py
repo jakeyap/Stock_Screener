@@ -46,7 +46,8 @@ def generate_csv_skeleton(directory='',filename=''):
    '''
    Function to generate skeleton code to copy raw data into
    '''
-   
+   if (directory==''):
+      directory = 'sample_data/skeletons/'
    if (filename==''):
       filename = 'csv_skeleton_data.csv'
    file = open(directory+filename, 'w')

@@ -126,7 +126,7 @@ def estimate_final_stock_price(data):
    eps = data['eps']
    return pe_ratio[-1] * eps[-1]
 
-def get_cashflow_list(year, data):
+def get_cashflow_list(year, data, taxrate=0):
    '''
    Function to get the cashflows starting from this year 
    Arguments:
@@ -140,9 +140,11 @@ def get_cashflow_list(year, data):
    temp_list = data['dividend']
    dividend_list = temp_list.copy()
    dividend_list = dividend_list[index:]
+   for i in range(len(dividend_list)):
+      dividend_list[i] = dividend_list[i] * (1-taxrate/100)
    return dividend_list
 
-def dcf_calculator(year, data, discount_rate=5):
+def dcf_calculator(year, data, discount_rate=5, taxrate=0):
    '''
    Calculates the present value of a stock 
    Assumes some dividends and selling price at the end
@@ -154,9 +156,9 @@ def dcf_calculator(year, data, discount_rate=5):
    Returns: 
       a number, present value
    '''
-   dividends = get_cashflow_list(year,data)
+   dividends = get_cashflow_list(year,data,taxrate)
    finalstockprice = estimate_final_stock_price(data)
-   print(finalstockprice)
+   print('Terminal stock price shld be '+str(round(finalstockprice,2)))
    # Need to include the selling price at the end
    dividends[-1] = dividends[-1] + finalstockprice
    return dcf_core(cashflowlist = dividends, discount_rate = discount_rate)
