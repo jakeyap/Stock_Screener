@@ -158,7 +158,7 @@ def dcf_calculator(year, data, discount_rate=5, taxrate=0):
    '''
    dividends = get_cashflow_list(year,data,taxrate)
    finalstockprice = estimate_final_stock_price(data)
-   print('Terminal stock price shld be '+str(round(finalstockprice,2)))
+   # print('Terminal stock price shld be '+str(round(finalstockprice,2)))
    # Need to include the selling price at the end
    dividends[-1] = dividends[-1] + finalstockprice
    return dcf_core(cashflowlist = dividends, discount_rate = discount_rate)

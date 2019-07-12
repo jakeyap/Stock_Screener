@@ -10,20 +10,9 @@ import data_plotter as plotter
 import fom_estimation as analyser
 import fom_projection as predictor
 import extract_stock_data as extractor
+import numpy as np
 
-estimated_roe = 20
-estimated_pe = 25
-estimated_payout_ratio = 20
-dcf_rate = 6
-div_taxrate = 30
-
-currentyear = 2019
-years2project = 10
-sampletitle = 'VISA_2019'
-filename = sampletitle+'_condensed.csv'
-directory = 'sample_data/'
-
-def analyze_data(directory='', filename='', title='test company'):
+def analyze_data(directory='', filename='', title='test company',plot=True):
    '''
    A wrapper function to generate summarized stock stats and show it graphically
    Arguments:
@@ -38,17 +27,17 @@ def analyze_data(directory='', filename='', title='test company'):
       data = generate_test_data.generate()
    else:
       data = extractor.read_csv2data(directory, filename)
-
+   
    # Show the min, max, avg, std of the PE, PB, ROE, payout_ratio
    print('Showing stats')
    stock_stats = analyser.analyze_all_data(data,showstats=True)
-   
    hist_roe = stock_stats['roe_avg']
    hist_pe = stock_stats['pe_ratio_avg']
    stringtoprint = 'Historical ROE mean: '+str(round(hist_roe,2)) + '\n'
    stringtoprint = stringtoprint + 'Historical PE mean: '+str(round(hist_pe,2))
    # Plot the old data, save it
-   plotter.plot_full_dataset(title=title+' data', directory=directory, data=data,annotate_string=stringtoprint)
+   if plot:
+      plotter.plot_full_dataset(title=title+' data', directory=directory, data=data,annotate_string=stringtoprint)
    return [data, stock_stats]
    
 def modify_stock_stats(stock_stats, est_roe=None, est_pe=None, est_payout_ratio=None):
@@ -70,25 +59,97 @@ def modify_stock_stats(stock_stats, est_roe=None, est_pe=None, est_payout_ratio=
       stock_stats['payout_ratio_avg'] = est_payout_ratio
    return stock_stats
 
-def project_data(data, stock_stats, projectionyear=2019, years2project=5, title='test company'):
+def project_data(data, stock_stats, projectionyear=2019, years2project=5, title='test company',
+                 discount_rate=5,taxrate=0,directory='',plot=True):
    '''
    A wrapper function to do prediction of a stock N number of years later
    '''
    new_data = predictor.modify_dataset_multi_year(data=data, predicted_stats=stock_stats, years=years2project)
-   presentvalue = predictor.dcf_calculator(year=currentyear,
+   presentvalue = predictor.dcf_calculator(year=projectionyear,
                                   data=new_data,
-                                  discount_rate=dcf_rate,
-                                  taxrate=div_taxrate)
+                                  discount_rate=discount_rate,
+                                  taxrate=taxrate)
    
-   stringtoprint = 'Long term ROE: ' + str(estimated_roe) +'\n'
-   stringtoprint = stringtoprint + 'Estimated PE:  ' + str(estimated_pe) + '\n'
-   stringtoprint = stringtoprint + 'Discount rate: ' + str(round(dcf_rate,2)) + '%\n'
-   stringtoprint = stringtoprint + 'Present value: '+str(presentvalue)
+   if (plot):
+      est_roe = stock_stats['roe_avg']
+      est_pe = stock_stats['pe_ratio_avg']
+      stringtoprint = 'Long term ROE: ' + str(est_roe) +'\n'
+      stringtoprint = stringtoprint + 'Estimated PE:  ' + str(est_pe) + '\n'
+      stringtoprint = stringtoprint + 'Discount rate: ' + str(round(discount_rate,2)) + '%\n'
+      stringtoprint = stringtoprint + 'Present value: '+str(presentvalue)
+      
+      plotter.plot_full_dataset(title=title+' predictions',
+                                data=new_data, 
+                                directory=directory, 
+                                projectionyear=projectionyear,
+                                annotate_string=stringtoprint)
+      print(stringtoprint)
+   return presentvalue
+
+def sweep_parameters_roe_and_pe(discount_rate=5, payout_ratio=0, 
+                                currentprice=None, 
+                                resolution=20, 
+                                projectionyear=2019,
+                                taxrate=0,
+                                directory='', filename='', 
+                                title='test company'
+                                ):
+   '''
+   sweeps ROE and PE across a range of +- 1sd
+   plug in ranges into the projection function
+   Discount rate and payout ratios are parameters
+   '''
+   # read ROE and PE stats first
+   [data, stock_stats] = analyze_data(directory=directory, filename=filename, title=title, plot=False)
+   pe_ratio_avg = stock_stats['pe_ratio_avg']
+   pe_ratio_std = stock_stats['pe_ratio_std']
+   roe_avg = stock_stats['roe_avg']
+   roe_std = stock_stats['roe_std']
    
-   plotter.plot_full_dataset(title=title+' predictions',
-                             data=new_data, 
-                             directory=directory, 
-                             projectionyear=projectionyear,
-                             annotate_string=stringtoprint)
-   print(stringtoprint)
-   return
+   # generate the ROE and PE ranges
+   pe_steps = np.zeros(shape=(1,2*resolution))
+   roe_steps = np.zeros(shape=(1,2*resolution))
+   
+   pe_stepsize = pe_ratio_std / resolution
+   roe_stepsize = roe_std / resolution
+   counter = -resolution
+   while (counter < resolution):
+      pe_steps[0][counter+resolution] = pe_stepsize * counter + pe_ratio_avg
+      roe_steps[0][counter+resolution] = roe_stepsize * counter + roe_avg
+      counter = counter + 1
+   
+   # Generate up the table of possible present values
+   presentvalues = np.zeros(shape=(2*resolution, 2*resolution))
+   for i in range(len(pe_steps[0])):
+      for j in range(len(roe_steps[0])):
+         test_pe = pe_steps[0][i]
+         test_roe = roe_steps[0][j]
+         new_stock_stats = modify_stock_stats(stock_stats, est_roe=test_roe, est_pe=test_pe, est_payout_ratio=payout_ratio)
+         presentvalue = project_data(data=data, stock_stats=new_stock_stats, 
+                                     projectionyear=projectionyear, 
+                                     years2project=5, title='test company',
+                                     discount_rate=5,taxrate=taxrate,
+                                     directory='', plot=False)
+         presentvalues[i][j] = presentvalue
+         #print('indexing at ' + str(i) + ',' +str(j))
+   
+   stringtoprint = 'discount rate: ' + str(round(discount_rate,2)) + '\n'
+   stringtoprint = stringtoprint + 'payout ratio: ' + str(round(payout_ratio,2)) + '\n'
+   stringtoprint = stringtoprint + 'tax rate: '+str(round(taxrate,2))
+   
+   plotter.plot_countour(pe_points=pe_steps,
+                         roe_points=roe_steps, 
+                         presentvalues=presentvalues,
+                         title=title,
+                         directory=directory,
+                         stringtoprint=stringtoprint)
+   
+   plotter.plot_wireframe(pe_points=pe_steps,
+                          roe_points=roe_steps,
+                          presentvalues=presentvalues,
+                          currentprice=currentprice,
+                          title=title,
+                          directory=directory,
+                          stringtoprint=stringtoprint)
+   
+   return {'pe_steps':pe_steps, 'roe_steps':roe_steps, 'presentvalues':presentvalues}

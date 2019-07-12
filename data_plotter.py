@@ -24,6 +24,8 @@ Important things to plot are:
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
+from mpl_toolkits.mplot3d import axes3d
 
 def plot_data(year_arr, data, title, folder):
     plt.plot(year_arr, data)
@@ -133,3 +135,40 @@ def shade_projections(plotlist, year):
          axes.set_ylim([ylimits[0], ylimits[1]])
          axes.set_xlim([xlimits[0], xlimits[1]])
    return
+
+def plot_countour(pe_points,roe_points,presentvalues, 
+                  directory='',
+                  title='',
+                  stringtoprint=''):
+   plot_directory = directory + 'generated_plots/'
+   plt.figure(figsize=(12,9))
+   ax = plt.gca()
+   X, Y = np.meshgrid(pe_points, roe_points)
+   CS = plt.contour(X, Y, presentvalues)
+   ax.clabel(CS, inline=1, fontsize=10)
+   plt.grid(True)
+   plt.suptitle(title+'\n'+stringtoprint,size=12)
+   plt.ylabel('Different ROEs')
+   plt.xlabel('Different PE ratios')
+   plt.savefig(plot_directory+title+'_contour.png')
+
+def plot_wireframe(pe_points,roe_points,presentvalues, currentprice=None,color='red',
+                   title='',
+                   directory='',
+                   stringtoprint=''):
+   plot_directory = directory + 'generated_plots/'
+   fig = plt.figure(figsize=(12,9))
+   ax = fig.add_subplot(111, projection='3d')
+   # Grab some test data.
+   X, Y = np.meshgrid(pe_points, roe_points)
+   # Plot a basic wireframe.
+   #ax.plot_wireframe(X, Y, Z, rstride=10, cstride=10)
+   ax.plot_wireframe(X, Y, presentvalues, color=color)
+   if currentprice is not None:
+      ref = np.ones(shape=presentvalues.shape) * currentprice
+      ax.plot_wireframe(X, Y, ref, color='gray')
+   plt.suptitle(title+'\n'+stringtoprint,size=12)
+   plt.ylabel('Different ROEs')
+   plt.xlabel('Different PE ratios')
+   plt.show()
+   plt.savefig(plot_directory+title+'_parameterized_2.png')
