@@ -97,23 +97,6 @@ def modify_dataset_multi_year(data, predicted_stats, years=10):
       data_old = data_copy
    return data_copy
 
-def dcf_core(cashflowlist, discount_rate=5):
-   '''
-   A function to backcalculate the present value of a cashflow
-   Arguments: 
-      cashflowlist: list of cashflows
-   '''
-   discount_factor = 1 + (discount_rate / 100)
-   length = len(cashflowlist)
-   pv = 0
-   counter = 0
-   while (counter < length):
-      denom = discount_factor**(counter+1)
-      numer = cashflowlist[counter]
-      pv = pv + (numer / denom)
-      counter = counter + 1
-   return round(pv,3)
-
 def estimate_final_stock_price(data):
    '''
    A function to get the final stock price when selling
@@ -162,3 +145,20 @@ def dcf_calculator(year, data, discount_rate=5, taxrate=0):
    # Need to include the selling price at the end
    dividends[-1] = dividends[-1] + finalstockprice
    return dcf_core(cashflowlist = dividends, discount_rate = discount_rate)
+
+def dcf_core(cashflowlist, discount_rate=5):
+   '''
+   A function to backcalculate the present value of a cashflow
+   Arguments: 
+      cashflowlist: list of cashflows
+   '''
+   discount_factor = 1 + (discount_rate / 100)
+   length = len(cashflowlist)
+   pv = 0
+   counter = 0
+   while (counter < length):
+      denom = discount_factor**(counter+1)
+      numer = cashflowlist[counter]
+      pv = pv + (numer / denom)
+      counter = counter + 1
+   return round(pv,3)

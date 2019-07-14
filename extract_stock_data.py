@@ -2,32 +2,6 @@
 """
 Created on Thu Jul 19 20:57:00 2018
 
-0. Regex editor to grab data from Morningstar CSVs.
-    Regex the following
-        year
-        absolute earnings
-        EPS
-        shares count
-        Year closing share price
-        Total equity
-        ST debt & LT debt
-        When data is found, plot the whole lot out for sanity checking
-
-Need to extract the following
-From balance sheet
-1. year
-2. total current assets
-3. total assets
-4. long term debt
-5. short term debt
-6. total liabilities
-7. total equity
-
-From income statement
-1. Net income available to common shareholders
-2. Earnings per share diluted
-3. 
-
    dictionary names
    'year':year, 
    'roe':roe,

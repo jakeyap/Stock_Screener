@@ -8,15 +8,14 @@ import main_functions_wrapper as main
 '''
 =========Key in parameters here==========
 '''
-estimated_roe = 11
-estimated_pe = 11
-estimated_payout_ratio = 40
-dcf_rate = 8
-div_taxrate = 0
-currentprice = 11.4
-currentyear = 2019
-years2project = 10
-sampletitle = 'OCBC_2019'
+estimated_roe = 24
+estimated_pe = 20
+estimated_payout_ratio = 55
+dcf_rate = 10
+div_taxrate = 30
+currentprice = 69
+years2project = 5
+sampletitle = 'LVS_2019'
 filename = sampletitle+'_condensed.csv'
 directory = 'sample_data/'
 '''
@@ -40,10 +39,11 @@ if __name__ == "__main__":
                          est_roe=estimated_roe,
                          est_pe=estimated_pe,
                          est_payout_ratio=estimated_payout_ratio)
-      
+      predictionyear = data['year'][-1] + 1
+
       main.project_data(data=data, 
                    stock_stats=stats,
-                   projectionyear=currentyear,
+                   projectionyear=predictionyear,
                    years2project=years2project,
                    title=sampletitle,
                    discount_rate=dcf_rate,
@@ -58,7 +58,7 @@ if __name__ == "__main__":
                                        filename=filename, 
                                        title=sampletitle,
                                        resolution=sweepresolution, 
-                                       projectionyear=currentyear,
+                                       projectionyear=predictionyear,
                                        taxrate=div_taxrate)
       
       #main.plotter.plot_countour(prices['pe_steps'],prices['roe_steps'],prices['presentvalues'])

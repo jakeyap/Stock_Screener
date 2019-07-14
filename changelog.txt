@@ -1,20 +1,29 @@
 ================================================
+Author: Yap Yong Keong                  Date: 2019 Jul 14th
+
+Done the automatic ROE, PE sweeps
+Included readme as well as an algorithm description
+================================================
 Author: Yap Yong Keong                  Date: 2019 Jul 9
 
-Implement tool to grab data automatically from the raw morningstar csv files.
+Done creating the basic analysis tool.
+Can plug in DCF discount rate, estimates of future ROE and PE, and estimate present value
 
+Next steps
+1. automate the data extraction process from morningstar csv spreadsheets
+2. automate selection of the ROE and PE figure by taking 1SD below mean
+3. sweep the ROE, PE, make discount rate as a parameter
+   make family of 3D plots to see what returns to expect
 ================================================
 Author: Yap Yong Keong                  Date: 2019 Jul 8
 
-Using the historical ROE averages, use it to estimate future book value.
-1. Estimate EPS_1 = (avg ROE) x bookvalue_0
-2. Estimate dividends_1 = EPS_1 x (avg payout_ratio)
-3. Estimate bookvalue_1 = (EPS_1 - div_1) + bookvalue_0
-4. Estimate stockprice_1 = EPS_1 x (avg PE)
-
-Iterate for some number of years, usually 5
 So far, the steps to grab raw data is manual download from Morningstar
 Copy the row/cols manually into a clean format.
+
+Used dictionaries to store the data instead of lists. More portable.
+Done extracting data from a csv
+Done generating some sample fake data
+Done doing the cash flow projections
 ================================================
 Author: Yap Yong Keong                  Date: 2019 Jul 7
 
@@ -40,3 +49,6 @@ The book titled Buffetology by Mary Buffet describes an algorithm.
     7. Is the company in serious debt? ( LTDebt + STDebt ) / Equity
     
 We will do regression on total earnings & EPS. Will predict earnings 10Y from now
+======================
+
+

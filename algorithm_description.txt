@@ -1,0 +1,84 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Jul 13 14:36:16 2019
+
+@author: Yong Keong
+"""
+
+This stock screener library is for quickly plotting the performance of a company across time.
+If you observe that it is somewhat stable and 'predictable', you can try to extrapolate future results.
+
+The core of this work revolves around the concept of ROE, return-on-equity.
+I think it generally works well, except in cases of extreme leverage.
+It also breaks down in companies with negative book value.
+
+Here's the algorithm in English.
+1. Plot the company's most important past data.
+        earnings per share (EPS) 
+        free cash flow per share (FCFPS)
+        dividend per share
+    Take a visual look. Is it stable or increasing? If too violent, chuck aside.
+2. Plot the company's return-on-equity (ROE). Is it increasing over time or stable? 
+   In the same plot, take a look at the payout ratio. Is the dividend sustainable?
+3. Plot the book value of the company and the stock price to get a sense of long term performance.
+4. Take a look at the share count. Is it increasing dramatically (indicating dilution)?
+5. In the future, there should be a look at the debt to equity ratios. This isn't done yet
+6. Once all those numbers are in, we take an estimate of the company's future prospects. 
+
+Let's say the managers are the same, some what decent. The ROE remains the same. 
+If you use this assumption, you can estimate the ROE from its average. 
+With an average ROE, you start the prediction algorithm. 
+
+In year 0, the company has book value of BV_0.
+In year 1, the company should make an EPS of ROE_avg x BV_0. 
+Some of it is paid out as dividends.
+
+The calculations should thus be
+EPS_1 = (ROE_avg x BV_0)            {This is earnings per share in year 1}
+DIV_1 = (EPS_1 x payoutratio)       {This is dividends per share}
+BV_1  = BV_0 + EPS_1 - DIV_1        {This is the book value for year 1 end}
+Stkprice_1 = EPS_1 x (PE_average)   {Estimate stock price from EPS & avg PE}
+
+Keep looping this process for however number of years you need. 
+Let's say we predict 5 years of data.
+Once you have this whole set of predictions, you can start to do DCF analysis.
+
+In the next 5 years, I know I will get a cash flow of
+Cashflow = DIV_1, DIV_2, DIV_3, DIV_4, DIV_5 (need to subtract div tax rates when calculating CF)
+In year 5, I also sell my stock
+Cashflow = DIV_1, DIV_2, DIV_3, DIV_4, DIV_5 + estimated stk price
+
+So plug in a DCF calculator of what discount rate you want, with the cashflow. 
+You can then see the present value of the stock in question. 
+If the present value is significantly higher than the market price, you may have found a gem.
+
+WARNING:
+This algorithm doesn't work well in cases where companies are extremely leveraged.
+When the ROE number becomes too high or negative, it becomes not very meaningful.
+Case in point, Boeing in 2019 has a negative book value because of share buybacks.
+
+The ROE is ill defined in this case. Not really applicable anymore.
+
+ROE is like a speed limit on the company. 
+If every piece of earnings was reinvested, the company cannot grow faster than that.
+Not without changing its fundamental operations or taking on more debt.
+
+===============================================================================
+Mary Buffett's descriptions of this algorithm
+1. Are earnings predictable? Consistent or growing?
+    Visual observation
+    
+2. Determine initial rate of return. 
+    (1/PE)
+    
+3. Determine per share earnings growth rate. 
+    Calculate from ROE, reinvestment, div payout_ratio
+    
+4. Determine value of company relative to gov bonds    
+    Plugging in DCF
+
+5. Determine the best/worst cases stock price using historical PE
+    Grab PE stats
+
+6. Is the company in serious debt? 
+    ( LTDebt + STDebt ) / Equity
