@@ -8,14 +8,14 @@ import main_functions_wrapper as main
 '''
 =========Key in parameters here==========
 '''
-estimated_roe = 24
-estimated_pe = 20
-estimated_payout_ratio = 55
+estimated_roe = 12
+estimated_pe = 8
+estimated_payout_ratio = 30
 dcf_rate = 10
-div_taxrate = 30
-currentprice = 69
-years2project = 5
-sampletitle = 'LVS_2019'
+div_taxrate = 0
+currentprice = 1.5
+years2project = 10
+sampletitle = 'YZJ_2019'
 filename = sampletitle+'_condensed.csv'
 directory = 'sample_data/'
 '''
