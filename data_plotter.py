@@ -33,7 +33,9 @@ def plot_data(year_arr, data, title, folder):
     #plt.savefig('C:/Users/Yong Keong/Documents/GitHub/Stock_Screener/'+folder+title+'.png')
     plt.savefig(folder+title+'.png')
     
-def plot_full_dataset(data, title='', directory='', projectionyear=0, annotate_string=None):
+def plot_full_dataset(data, title='', directory='', 
+                      projectionyear=0, annotate_string=None,
+                      bollingerdata = None):
    '''
    Function to plot out the whole dictionary of stats
    Arguments:
@@ -42,6 +44,7 @@ def plot_full_dataset(data, title='', directory='', projectionyear=0, annotate_s
       directory: folder to save the plots in
       projectionyear: where to start shading from. if 0, dont shade
       annotate_data: for plugging in the dictionary of roe, pe
+      bollingerdata: for plotting bollinger bands. If None, do nothing
    '''
    # define place to store plots
    plot_directory = directory + 'generated_plots/'
@@ -77,6 +80,13 @@ def plot_full_dataset(data, title='', directory='', projectionyear=0, annotate_s
    plt.title('Blue: Payout ratio, red: ROE')
    plt.plot(year, payout_ratio, color='blue')
    plt.plot(year, roe, color='red')
+   if bollingerdata is not None:
+      bollinger_roe_top = bollingerdata['bollinger_top']
+      bollinger_roe_mid = bollingerdata['bollinger_mid']
+      bollinger_roe_bot = bollingerdata['bollinger_bot']
+      plt.plot(year,bollinger_roe_top,'--',color='red')
+      plt.plot(year,bollinger_roe_mid,'--',color='red')
+      plt.plot(year,bollinger_roe_bot,'--',color='red')
    
    plot3 = plt.subplot(2,3,3)
    plt.title('Shares')

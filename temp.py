@@ -5,21 +5,12 @@ Created on Mon Jul 22 20:22:37 2019
 @author: Yong Keong
 """
 
-import pandas as pd
-import bs4 
-from selenium import webdriver 
+import matplotlib.pyplot as plt
+import numpy as np
+import generate_test_data as tester
 
-url = 'https://www.morningstar.com/stocks/xnas/ba/quote.html'
 
-browser = webdriver.Chrome()
-browser.get(url)
-
-html = browser.page_source
-
-soup = bs4.BeautifulSoup(html,'html.parser')
-
-price = soup.find('div', {'id':'message-box-price'})
-price2 = price.text.strip()
-print(price2)
-
-browser.close()
+roelist = data['roe']
+roelist
+roe_bands = math_tools.generate_bollinger_bands(roelist,1,5)
+roe_bands['bollinger_mid']

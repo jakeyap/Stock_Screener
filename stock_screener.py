@@ -12,10 +12,10 @@ estimated_roe = 11
 estimated_pe = 4
 estimated_payout_ratio = 25
 dcf_rate = 10
-div_taxrate = 0
-currentprice = 0.48
+div_taxrate = 30
+currentprice = 178
 years2project = 10
-sampletitle = 'TATSENG_2019'
+sampletitle = 'VISA_2019'
 filename = sampletitle+'_condensed.csv'
 directory = 'sample_data/'
 '''
@@ -26,6 +26,7 @@ directory = 'sample_data/'
 '''
 plot_1_prediction = True
 plot_sweeps = True
+bollinger_compensation = True
 '''
 =========END of plot parameters=========
 '''
@@ -41,7 +42,7 @@ if __name__ == "__main__":
                          est_payout_ratio=estimated_payout_ratio)
       predictionyear = data['year'][-1] + 1
 
-      main.project_data(data=data, 
+      main.project_data_by_roe(data=data, 
                    stock_stats=stats,
                    projectionyear=predictionyear,
                    years2project=years2project,
@@ -58,6 +59,7 @@ if __name__ == "__main__":
                                        filename=filename, 
                                        title=sampletitle,
                                        resolution=sweepresolution, 
+                                       bollinger_compensation=bollinger_compensation,
                                        projectionyear=predictionyear,
                                        taxrate=div_taxrate)
       

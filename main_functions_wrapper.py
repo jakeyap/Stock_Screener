@@ -11,6 +11,7 @@ import fom_estimation as analyser
 import fom_projection as predictor
 import extract_stock_data as extractor
 import numpy as np
+import math_tools as bollinger
 
 def analyze_data(directory='', filename='', title='test company',plot=True):
    '''
@@ -28,6 +29,8 @@ def analyze_data(directory='', filename='', title='test company',plot=True):
    else:
       data = extractor.read_csv2data(directory, filename)
    
+   bollinger_data = bollinger.generate_bollinger_roe(data_dict=data,std_mult=3,num_periods=5)
+   
    # Show the min, max, avg, std of the PE, PB, ROE, payout_ratio
    print('Showing stats')
    stock_stats = analyser.analyze_all_data(data,showstats=True)
@@ -37,7 +40,9 @@ def analyze_data(directory='', filename='', title='test company',plot=True):
    stringtoprint = stringtoprint + 'Historical PE mean: '+str(round(hist_pe,2))
    # Plot the old data, save it
    if plot:
-      plotter.plot_full_dataset(title=title+' data', directory=directory, data=data,annotate_string=stringtoprint)
+      plotter.plot_full_dataset(title=title+' data', directory=directory, data=data,
+                                annotate_string=stringtoprint,
+                                bollingerdata=bollinger_data)
    return [data, stock_stats]
    
 def modify_stock_stats(stock_stats, est_roe=None, est_pe=None, est_payout_ratio=None):
@@ -59,7 +64,7 @@ def modify_stock_stats(stock_stats, est_roe=None, est_pe=None, est_payout_ratio=
       stock_stats['payout_ratio_avg'] = est_payout_ratio
    return stock_stats
 
-def project_data(data, stock_stats, projectionyear=2019, years2project=5, title='test company',
+def project_data_by_roe(data, stock_stats, projectionyear=2019, years2project=5, title='test company',
                  discount_rate=5,taxrate=0,directory='',plot=True):
    '''
    A wrapper function to do prediction of a stock N number of years later
@@ -92,12 +97,17 @@ def sweep_parameters_roe_and_pe(discount_rate=5, payout_ratio=0,
                                 projectionyear=2019,
                                 taxrate=0,
                                 directory='', filename='', 
-                                title='test company'
+                                title='test company',
+                                bollinger_compensation=False
                                 ):
    '''
-   sweeps ROE and PE across a range of +- 1sd
+   sweeps ROE and PE across a range of +- 1sd across all time
    plug in ranges into the projection function
    Discount rate and payout ratios are parameters
+   
+   bollinger_compensation is a boolean. 
+   If false, use ROE across all time to make estimates
+   If true, use bollinger bands to estimate future ROEs
    '''
    # read ROE and PE stats first
    [data, stock_stats] = analyze_data(directory=directory, filename=filename, title=title, plot=False)
@@ -105,6 +115,14 @@ def sweep_parameters_roe_and_pe(discount_rate=5, payout_ratio=0,
    pe_ratio_std = stock_stats['pe_ratio_std']
    roe_avg = stock_stats['roe_avg']
    roe_std = stock_stats['roe_std']
+   
+   if bollinger_compensation:
+      bollinger_data = bollinger.generate_bollinger_roe(data_dict=data,std_mult=1,num_periods=5)
+      bollinger_top = bollinger_data['bollinger_top']
+      bollinger_mid = bollinger_data['bollinger_mid']
+      roe_avg = bollinger_mid[-1]
+      roe_std = bollinger_top[-1] - roe_avg
+      
    
    # generate the ROE and PE ranges
    pe_steps = np.zeros(shape=(1,2*resolution))
@@ -125,7 +143,7 @@ def sweep_parameters_roe_and_pe(discount_rate=5, payout_ratio=0,
          test_pe = pe_steps[0][i]
          test_roe = roe_steps[0][j]
          new_stock_stats = modify_stock_stats(stock_stats, est_roe=test_roe, est_pe=test_pe, est_payout_ratio=payout_ratio)
-         presentvalue = project_data(data=data, stock_stats=new_stock_stats, 
+         presentvalue = project_data_by_roe(data=data, stock_stats=new_stock_stats, 
                                      projectionyear=projectionyear, 
                                      years2project=5, title='test company',
                                      discount_rate=5,taxrate=taxrate,
