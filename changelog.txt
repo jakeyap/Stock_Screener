@@ -1,4 +1,16 @@
 ================================================
+Author: Yap Yong Keong                  Date: 2019 Aug 17th
+
+Included bollinger bands to plot the expected ROE fluctuations.
+Discarded ROEs from too old samples with some flexibility to parametize.
+
+Included normal distributions probability density functions.
+Used PDFs to calculate the expected price outcomes.
+TODO in the future:
+1. Make a tool to properly choose discount rates systematically.
+2. Automate the extraction process
+
+================================================
 Author: Yap Yong Keong                  Date: 2019 Jul 14th
 
 Done the automatic ROE, PE sweeps

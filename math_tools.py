@@ -5,6 +5,9 @@ Created on Sat Aug 17 00:29:28 2019
 @author: Yong Keong
 """
 import numpy as np
+import generate_test_data as generator
+import matplotlib.pyplot as plt
+import scipy.stats as stats
 
 def generate_bollinger_bands(datalist, std_multiplier, num_periods):
    '''
@@ -33,11 +36,11 @@ def generate_bollinger_bands(datalist, std_multiplier, num_periods):
       index = index + 1
       
    while index < datalen:
-      period_mean = sum (datalist[index-num_periods:index+1]) / num_periods
+      period_mean = sum (datalist[index+1-num_periods : index+1]) / num_periods
       band_mid.append(period_mean)
       
       period_std = 0
-      for each in datalist[index-num_periods:index]:
+      for each in datalist[index+1-num_periods : index+1]:
          period_std = period_std + (each - period_mean)**2
       period_std = np.sqrt(period_std) / num_periods
       band_top.append( period_mean + std_multiplier * period_std )
@@ -49,5 +52,90 @@ def generate_bollinger_bands(datalist, std_multiplier, num_periods):
            'bollinger_bot': band_bot}
 
 def generate_bollinger_roe(data_dict, std_mult=3, num_periods=5):
+   '''
+   Takes the above bollinger band function and runs it on ROE.
+   args: data_dict is a dictionary of stock data
+   returns a dictionary, same as above function
+   '''
    hist_roe = data_dict ['roe']   
    return generate_bollinger_bands(hist_roe, std_multiplier=std_mult, num_periods=num_periods)
+
+def generate_single_norm_dist(mean=0,std=1, resolution=20, width_of_bell=3):
+   '''
+   Generates PDF of a normal distribution. 
+   Truncates and approximates into buckets.
+   Rescales so that the sum is 1
+   Args:
+      mean: mean of normal distribution
+      std : standard dev of normal distribution
+      resolution: how many steps are in this normal dist
+      width_of_bell: how many SDs away from mean to check. default is 3
+   Returns:
+      list of 2 lists [xvals, yvals]
+      xvals: list of xvalues on a normal distribution
+      yvals: list of yvalues on a normal distribution
+   '''
+   xvals = np.array(range(-resolution, resolution+1))
+   xvals = xvals * width_of_bell / resolution
+   random_variable = stats.norm()
+   yvals = random_variable.pdf(xvals)
+   # do the rescaling here so that the bars sum to 1
+   yvals = yvals * (width_of_bell / resolution)
+   
+   # rescale x axis to get the right mean and spread values
+   xvals = xvals * std + mean
+   return [xvals, yvals]
+   
+def generate_2axis_norm_dist(xmean, xstd, ymean, ystd, resolution=20, width_of_bell=3):
+   '''
+   Same as above except for 2 dimension input
+   Args:
+      mean: mean of normal distribution
+      std : standard dev of normal distribution
+      resolution: how many steps are in this normal dist
+      width_of_bell: how many SDs away from mean to check. default is 3
+   Returns:
+      list of 2 lists [xvals, yvals]
+      xvals: list of xvalues on 1st axis of normal distribution
+      yvals: list of yvalues on 2nd axis of normal distribution
+      zvals: list of zvalues outputs of normal dist
+   '''
+   xvals, zvals1 = generate_single_norm_dist(mean=xmean, std=xstd, resolution=resolution)
+   yvals, zvals2 = generate_single_norm_dist(mean=ymean, std=ystd, resolution=resolution)
+   
+   xlength = xvals.shape[0]
+   ylength = yvals.shape[0]
+   
+   zvals1 = zvals1.reshape(xlength,1)
+   zvals2 = zvals2.reshape(1,ylength)
+   
+   zvals = np.dot(zvals1,zvals2)
+   return [xvals, yvals, zvals]
+   
+
+
+if __name__ == '__main__':
+#   fakedata = generator.generate()
+#   year = fakedata['year']
+#   roes = fakedata['roe']
+#   boil_bands = generate_bollinger_roe(fakedata, std_mult=3, num_periods=2)
+#   boil_top = boil_bands['bollinger_top']
+#   boil_mid = boil_bands['bollinger_mid']
+#   boil_bot = boil_bands['bollinger_bot']
+#   plt.plot(year,roes,color='red')
+#   plt.plot(year,boil_top,color='blue')
+#   plt.plot(year,boil_mid,color='blue')
+#   plt.plot(year,boil_bot,color='blue')
+   
+#   xvals, yvals = generate_single_norm_dist(mean=10,std=10,resolution=20) 
+#   plt.bar(xvals,yvals)
+#   sum(yvals)
+
+   xvals, yvals, zvals = generate_2axis_norm_dist(10,0.1,0,1,20) 
+   fig = plt.figure()
+   ax = fig.add_subplot(111, projection='3d')
+   # Grab some test data.
+   X, Y = np.meshgrid(xvals, yvals)
+   # Plot a basic wireframe.
+   #ax.plot_wireframe(X, Y, Z, rstride=10, cstride=10)
+   ax.plot_wireframe(X, Y, zvals, color='red')

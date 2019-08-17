@@ -11,15 +11,17 @@ import fom_estimation as analyser
 import fom_projection as predictor
 import extract_stock_data as extractor
 import numpy as np
-import math_tools as bollinger
+import math_tools as math
 
-def analyze_data(directory='', filename='', title='test company',plot=True):
+def analyze_data(directory='', filename='', title='test company',plot=True,showstats=True):
    '''
    A wrapper function to generate summarized stock stats and show it graphically
    Arguments:
       directory: the raw file directory
       filename: uh huh
       title: string to be saved into the plot
+      plot: whether to plot the graphs or not
+      showstats: whether to show the summary stats of data or not
    Returns: [stats, data]
       stats: a dictionary containing _min _max _avg _std of roe pe_ratio payout_ratio pb_ratio 
       data: a dictionary of the whole stock data
@@ -29,11 +31,12 @@ def analyze_data(directory='', filename='', title='test company',plot=True):
    else:
       data = extractor.read_csv2data(directory, filename)
    
-   bollinger_data = bollinger.generate_bollinger_roe(data_dict=data,std_mult=3,num_periods=5)
+   bollinger_data = math.generate_bollinger_roe(data_dict=data,std_mult=3,num_periods=5)
    
    # Show the min, max, avg, std of the PE, PB, ROE, payout_ratio
-   print('Showing stats')
-   stock_stats = analyser.analyze_all_data(data,showstats=True)
+   if showstats:
+      print('Showing stats')
+   stock_stats = analyser.analyze_all_data(data,showstats=showstats)
    hist_roe = stock_stats['roe_avg']
    hist_pe = stock_stats['pe_ratio_avg']
    stringtoprint = 'Historical ROE mean: '+str(round(hist_roe,2)) + '\n'
@@ -98,8 +101,9 @@ def sweep_parameters_roe_and_pe(discount_rate=5, payout_ratio=0,
                                 taxrate=0,
                                 directory='', filename='', 
                                 title='test company',
-                                bollinger_compensation=False
-                                ):
+                                bollinger_compensation=False,
+                                std_multiplier=3,
+                                years2project=5):
    '''
    sweeps ROE and PE across a range of +- 1sd across all time
    plug in ranges into the projection function
@@ -110,50 +114,64 @@ def sweep_parameters_roe_and_pe(discount_rate=5, payout_ratio=0,
    If true, use bollinger bands to estimate future ROEs
    '''
    # read ROE and PE stats first
-   [data, stock_stats] = analyze_data(directory=directory, filename=filename, title=title, plot=False)
+   [data, stock_stats] = analyze_data(directory=directory, filename=filename, title=title, plot=False, showstats=False)
    pe_ratio_avg = stock_stats['pe_ratio_avg']
    pe_ratio_std = stock_stats['pe_ratio_std']
    roe_avg = stock_stats['roe_avg']
    roe_std = stock_stats['roe_std']
    
    if bollinger_compensation:
-      bollinger_data = bollinger.generate_bollinger_roe(data_dict=data,std_mult=1,num_periods=5)
+      bollinger_data = math.generate_bollinger_roe(data_dict=data,std_mult=1,num_periods=5)
       bollinger_top = bollinger_data['bollinger_top']
       bollinger_mid = bollinger_data['bollinger_mid']
       roe_avg = bollinger_mid[-1]
       roe_std = bollinger_top[-1] - roe_avg
       
+   pe_stepsize = pe_ratio_std * std_multiplier / resolution
+   roe_stepsize = roe_std * std_multiplier / resolution
    
    # generate the ROE and PE ranges
-   pe_steps = np.zeros(shape=(1,2*resolution))
-   roe_steps = np.zeros(shape=(1,2*resolution))
-   
-   pe_stepsize = pe_ratio_std / resolution
-   roe_stepsize = roe_std / resolution
-   counter = -resolution
-   while (counter < resolution):
-      pe_steps[0][counter+resolution] = pe_stepsize * counter + pe_ratio_avg
-      roe_steps[0][counter+resolution] = roe_stepsize * counter + roe_avg
-      counter = counter + 1
+   steps = np.array(range(-resolution, resolution+1))
+   steps = steps.reshape(1,2*resolution+1)
+   #pe_steps = np.zeros(shape=(1,2*resolution))
+   pe_steps = steps * pe_stepsize + pe_ratio_avg
+   #roe_steps = np.zeros(shape=(1,2*resolution))
+   roe_steps = steps * roe_stepsize + roe_avg
    
    # Generate up the table of possible present values
-   presentvalues = np.zeros(shape=(2*resolution, 2*resolution))
-   for i in range(len(pe_steps[0])):
-      for j in range(len(roe_steps[0])):
+   presentvalues = np.zeros(shape=(pe_steps.shape[1], roe_steps.shape[1]))
+   # Generate probability of weights
+   _, _, prob_weights = math.generate_2axis_norm_dist(xmean=pe_ratio_avg,
+                                                xstd=pe_ratio_std,
+                                                ymean=roe_avg,
+                                                ystd=roe_std,
+                                                resolution=resolution,
+                                                width_of_bell=std_multiplier)
+   
+   # Calculate all outcomes within the realm of 3SDs
+   for i in range(pe_steps.shape[1]):
+      for j in range(roe_steps.shape[1]):
          test_pe = pe_steps[0][i]
          test_roe = roe_steps[0][j]
          new_stock_stats = modify_stock_stats(stock_stats, est_roe=test_roe, est_pe=test_pe, est_payout_ratio=payout_ratio)
          presentvalue = project_data_by_roe(data=data, stock_stats=new_stock_stats, 
                                      projectionyear=projectionyear, 
-                                     years2project=5, title='test company',
-                                     discount_rate=5,taxrate=taxrate,
+                                     years2project=years2project, title='test company',
+                                     discount_rate=discount_rate,
+                                     taxrate=taxrate,
                                      directory='', plot=False)
+         if presentvalue < 0:
+            presentvalue = 0
          presentvalues[i][j] = presentvalue
-         #print('indexing at ' + str(i) + ',' +str(j))
    
-   stringtoprint = 'discount rate: ' + str(round(discount_rate,2)) + '\n'
-   stringtoprint = stringtoprint + 'payout ratio: ' + str(round(payout_ratio,2)) + '\n'
-   stringtoprint = stringtoprint + 'tax rate: '+str(round(taxrate,2))
+   # Calculate EV for each outcome and come up with a full EV
+   expected_value = presentvalues * prob_weights
+   expected_value = np.sum(expected_value)
+   
+   stringtoprint = 'discount rate: ' + str(round(discount_rate,2)) + '%\n'
+   stringtoprint = stringtoprint + 'payout ratio: ' + str(round(payout_ratio,2)) + '%\n'
+   stringtoprint = stringtoprint + 'tax rate: '+str(round(taxrate,2)) + '%\n'
+   stringtoprint = stringtoprint + 'expected present value: '+str(round(expected_value,2)) +'\n'
    
    plotter.plot_countour(pe_points=pe_steps,
                          roe_points=roe_steps, 

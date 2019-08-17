@@ -8,14 +8,14 @@ import main_functions_wrapper as main
 '''
 =========Key in parameters here==========
 '''
-estimated_roe = 11
-estimated_pe = 4
+estimated_roe = 13
+estimated_pe = 5
 estimated_payout_ratio = 25
-dcf_rate = 10
-div_taxrate = 30
-currentprice = 178
+dcf_rate = 15
+div_taxrate = 0
+currentprice = 0.5
 years2project = 10
-sampletitle = 'VISA_2019'
+sampletitle = 'TATSENG_2019'
 filename = sampletitle+'_condensed.csv'
 directory = 'sample_data/'
 '''
@@ -61,6 +61,8 @@ if __name__ == "__main__":
                                        resolution=sweepresolution, 
                                        bollinger_compensation=bollinger_compensation,
                                        projectionyear=predictionyear,
-                                       taxrate=div_taxrate)
+                                       taxrate=div_taxrate,
+                                       std_multiplier=3,
+                                       years2project=years2project)
       
       #main.plotter.plot_countour(prices['pe_steps'],prices['roe_steps'],prices['presentvalues'])

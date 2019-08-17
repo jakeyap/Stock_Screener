@@ -157,7 +157,7 @@ def plot_countour(pe_points,roe_points,presentvalues,
    CS = plt.contour(X, Y, presentvalues)
    ax.clabel(CS, inline=1, fontsize=10)
    plt.grid(True)
-   plt.suptitle(title+'\n'+stringtoprint,size=12)
+   plt.suptitle(title+'\n'+stringtoprint,size=10)
    plt.ylabel('Different ROEs')
    plt.xlabel('Different PE ratios')
    plt.savefig(plot_directory+title+'_contour.png')
@@ -172,12 +172,11 @@ def plot_wireframe(pe_points,roe_points,presentvalues, currentprice=None,color='
    # Grab some test data.
    X, Y = np.meshgrid(pe_points, roe_points)
    # Plot a basic wireframe.
-   #ax.plot_wireframe(X, Y, Z, rstride=10, cstride=10)
    ax.plot_wireframe(X, Y, presentvalues, color=color)
    if currentprice is not None:
       ref = np.ones(shape=presentvalues.shape) * currentprice
       ax.plot_wireframe(X, Y, ref, color='gray')
-   plt.suptitle(title+'\n'+stringtoprint,size=12)
+   plt.suptitle(title+'\n'+stringtoprint,size=10)
    plt.ylabel('Different ROEs')
    plt.xlabel('Different PE ratios')
    plt.show()
