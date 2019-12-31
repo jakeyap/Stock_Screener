@@ -100,8 +100,8 @@ def generate_2axis_norm_dist(xmean, xstd, ymean, ystd, resolution=20, width_of_b
       yvals: list of yvalues on 2nd axis of normal distribution
       zvals: list of zvalues outputs of normal dist
    '''
-   xvals, zvals1 = generate_single_norm_dist(mean=xmean, std=xstd, resolution=resolution)
-   yvals, zvals2 = generate_single_norm_dist(mean=ymean, std=ystd, resolution=resolution)
+   xvals, zvals1 = generate_single_norm_dist(mean=xmean, std=xstd, resolution=resolution, width_of_bell=width_of_bell)
+   yvals, zvals2 = generate_single_norm_dist(mean=ymean, std=ystd, resolution=resolution, width_of_bell=width_of_bell)
    
    xlength = xvals.shape[0]
    ylength = yvals.shape[0]

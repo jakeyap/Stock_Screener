@@ -8,10 +8,10 @@ import main_functions_wrapper as main
 '''
 =========Key in parameters here==========
 '''
-estimated_roe = 13
+estimated_roe = 13.5
 estimated_pe = 5
 estimated_payout_ratio = 25
-dcf_rate = 15
+dcf_rate = 13
 div_taxrate = 0
 currentprice = 0.5
 years2project = 10
@@ -62,7 +62,7 @@ if __name__ == "__main__":
                                        bollinger_compensation=bollinger_compensation,
                                        projectionyear=predictionyear,
                                        taxrate=div_taxrate,
-                                       std_multiplier=3,
+                                       std_multiplier=2,
                                        years2project=years2project)
       
       #main.plotter.plot_countour(prices['pe_steps'],prices['roe_steps'],prices['presentvalues'])
