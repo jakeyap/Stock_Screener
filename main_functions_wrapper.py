@@ -103,7 +103,9 @@ def sweep_parameters_roe_and_pe(discount_rate=5, payout_ratio=0,
                                 title='test company',
                                 bollinger_compensation=False,
                                 std_multiplier=3,
-                                years2project=5):
+                                years2project=5,
+                                hard_code_pe=None,
+                                hard_code_roe=None):
    '''
    sweeps ROE and PE across a range of +- 1sd across all time
    plug in ranges into the projection function
@@ -115,10 +117,19 @@ def sweep_parameters_roe_and_pe(discount_rate=5, payout_ratio=0,
    '''
    # read ROE and PE stats first
    [data, stock_stats] = analyze_data(directory=directory, filename=filename, title=title, plot=False, showstats=False)
-   pe_ratio_avg = stock_stats['pe_ratio_avg']
-   pe_ratio_std = stock_stats['pe_ratio_std']
-   roe_avg = stock_stats['roe_avg']
-   roe_std = stock_stats['roe_std']
+   if hard_code_pe is None:
+      pe_ratio_avg = stock_stats['pe_ratio_avg']
+      pe_ratio_std = stock_stats['pe_ratio_std']
+   else:
+      pe_ratio_avg = hard_code_pe['pe_ratio_avg']
+      pe_ratio_std = hard_code_pe['pe_ratio_std']
+   if hard_code_roe is None:
+      roe_avg = stock_stats['roe_avg']
+      roe_std = stock_stats['roe_std']
+   else:
+      roe_avg = hard_code_roe['roe_avg']
+      roe_std = hard_code_roe['roe_std']
+      
    
    if bollinger_compensation:
       bollinger_data = math.generate_bollinger_roe(data_dict=data,std_mult=1,num_periods=5)
