@@ -8,14 +8,14 @@ import main_functions_wrapper as main
 '''
 =========Key in parameters here==========
 '''
-currentprice = 204
-estimated_roe = 17
-estimated_pe = 20
-estimated_payout_ratio = 0
+currentprice = 205
+estimated_roe = 30
+estimated_pe = 30
+estimated_payout_ratio = 25
 dcf_rate = 10
 div_taxrate = 30
 years2project = 10
-sampletitle = 'FB_2020'
+sampletitle = 'VISA_2020'
 filename = sampletitle+'_condensed.csv'
 directory = 'sample_data/'
 '''
@@ -52,9 +52,10 @@ if __name__ == "__main__":
                    directory=directory)
    if plot_sweeps:
       sweepresolution=20
-      hard_code_pe = {}
-      hard_code_pe['pe_ratio_avg'] = 20
-      hard_code_pe['pe_ratio_std'] = 5
+      #hard_code_pe = {}
+      #hard_code_pe['pe_ratio_avg'] = 20
+      #hard_code_pe['pe_ratio_std'] = 5
+      hard_code_pe = None
       prices = main.sweep_parameters_roe_and_pe(discount_rate=dcf_rate, 
                                        payout_ratio=estimated_payout_ratio, 
                                        currentprice=currentprice,
@@ -65,7 +66,7 @@ if __name__ == "__main__":
                                        bollinger_compensation=bollinger_compensation,
                                        projectionyear=predictionyear,
                                        taxrate=div_taxrate,
-                                       std_multiplier=2,
+                                       std_multiplier=3,
                                        years2project=years2project,
                                        hard_code_pe=hard_code_pe)
       
