@@ -132,7 +132,9 @@ def sweep_parameters_roe_and_pe(discount_rate=5, payout_ratio=0,
       
    
     if bollinger_compensation:
-        bollinger_data = math.generate_bollinger_roe(data_dict=data,std_mult=1,num_periods=5)
+        bollinger_data = math.generate_bollinger_roe(data_dict=data,
+                                                     std_mult=std_multiplier,
+                                                     num_periods=5)
         bollinger_top = bollinger_data['bollinger_top']
         bollinger_mid = bollinger_data['bollinger_mid']
         roe_avg = bollinger_mid[-1]
