@@ -8,12 +8,12 @@ import main_functions_wrapper as main
 '''
 =========Key in parameters here==========
 '''
-currentprice = 1400
-estimated_roe = 28
-estimated_pe = 25
-estimated_payout_ratio = 0
-dcf_rate = 10
-div_taxrate = 21
+currentprice = 9.3
+estimated_roe = 10
+estimated_pe = 12
+estimated_payout_ratio = 35
+dcf_rate = 15
+div_taxrate = 0
 years2project = 10
 sampletitle = 'HAWPAR_2020'
 filename = sampletitle+'_condensed.csv'
@@ -53,8 +53,8 @@ if __name__ == "__main__":
     if plot_sweeps:
         sweepresolution=20
         #hard_code_pe = {}
-        #hard_code_pe['pe_ratio_avg'] = 20
-        #hard_code_pe['pe_ratio_std'] = 5
+        #hard_code_pe['pe_ratio_avg'] = 13
+        #hard_code_pe['pe_ratio_std'] = 1.5
         hard_code_pe = None
         prices = main.sweep_parameters_roe_and_pe(discount_rate=dcf_rate, 
                                                   payout_ratio=estimated_payout_ratio, 
