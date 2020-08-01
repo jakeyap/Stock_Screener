@@ -34,6 +34,7 @@ def analyze_metric(data, name=''):
         name_std: st dev of list
         }
     '''
+    
     data_min = np.min(data)
     data_max = np.max(data)
     data_avg = np.average(data)

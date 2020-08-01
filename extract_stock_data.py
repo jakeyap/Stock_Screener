@@ -20,6 +20,7 @@ Created on Thu Jul 19 20:57:00 2018
 import csv
 import re
 import matplotlib.pyplot as plt
+import math
 
 def read_csv2data(data_directory, filename):
     ''' 
@@ -95,7 +96,7 @@ def convert2float(text):
     try:
         return float(text)
     except Exception:
-        return 0
+        return math.nan
 
 def fmt_year_list(yearlist):
     ''' 

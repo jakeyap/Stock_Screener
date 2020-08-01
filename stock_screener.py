@@ -9,13 +9,13 @@ import main_functions_wrapper as main
 =========Key in parameters here==========
 '''
 currentprice = 1400
-estimated_roe = 15
+estimated_roe = 28
 estimated_pe = 25
 estimated_payout_ratio = 0
 dcf_rate = 10
-div_taxrate = 30
-years2project = 5
-sampletitle = 'Google_2020'
+div_taxrate = 21
+years2project = 10
+sampletitle = 'HAWPAR_2020'
 filename = sampletitle+'_condensed.csv'
 directory = 'sample_data/'
 '''
@@ -25,7 +25,7 @@ directory = 'sample_data/'
 =========Key in plot parameters==========
 '''
 plot_1_prediction = True
-plot_sweeps = True
+plot_sweeps = False
 bollinger_compensation = True
 '''
 =========END of plot parameters=========
