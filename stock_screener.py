@@ -8,16 +8,17 @@ import main_functions_wrapper as main
 '''
 =========Key in parameters here==========
 '''
-currentprice = 9.3
-estimated_roe = 10
-estimated_pe = 12
-estimated_payout_ratio = 35
-dcf_rate = 15
-div_taxrate = 0
+currentprice = 58
+estimated_roe = 23
+estimated_pe = 14
+estimated_payout_ratio = 38
+dcf_rate = 12
+div_taxrate = 30
 years2project = 10
-sampletitle = 'HAWPAR_2020'
+sampletitle = 'INTC_2021'
 filename = sampletitle+'_condensed.csv'
 directory = 'sample_data/'
+std_multiplier = 2
 '''
 =========END of stock parameters=========
 '''
@@ -25,7 +26,7 @@ directory = 'sample_data/'
 =========Key in plot parameters==========
 '''
 plot_1_prediction = True
-plot_sweeps = False
+plot_sweeps = True
 bollinger_compensation = True
 '''
 =========END of plot parameters=========
@@ -66,7 +67,7 @@ if __name__ == "__main__":
                                                   bollinger_compensation=bollinger_compensation,
                                                   projectionyear=predictionyear,
                                                   taxrate=div_taxrate,
-                                                  std_multiplier=3,
+                                                  std_multiplier=std_multiplier,
                                                   years2project=years2project,
                                                   hard_code_pe=hard_code_pe)
       

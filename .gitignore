@@ -50,3 +50,6 @@ Temporary Items
 # Database folders
 # =========================
 #sample_data/
+
+.spyproject/
+.__pycache__/
