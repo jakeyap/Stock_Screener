@@ -112,7 +112,17 @@ def generate_2axis_norm_dist(xmean, xstd, ymean, ystd, resolution=20, width_of_b
     zvals = np.dot(zvals1,zvals2)
     return [xvals, yvals, zvals]
    
-
+def generate_discount_rate(risk_free_rate=0.01, num_years=10, success_rate = 0.33):
+    # generates a discount rate based on risk free rate, failure likelihood
+    # prob_success x [1 + r]^n >= [1 + rfr]^n
+    # [1 + r] >= [1 + rfr] / [prob_success ^ (1/n)]
+    # r >= [1 + rfr] / [prob_success ^ (1/n)] - 1
+    
+    numer = 1 + risk_free_rate
+    denom = success_rate ** (1/num_years)
+    
+    return (numer/denom) - 1
+    
 
 if __name__ == '__main__':
 #   fakedata = generator.generate()
