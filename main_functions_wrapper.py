@@ -31,7 +31,7 @@ def analyze_data(directory='', filename='', title='test company',plot=True,shows
     else:
         data = extractor.read_csv2data(directory, filename)
     
-    bollinger_data = math.generate_bollinger_roe(data_dict=data,std_mult=3,num_periods=5)
+    bollinger_data = math.generate_bollinger_roe(data_dict=data,std_mult=3,num_periods=2)
     
     # Show the min, max, avg, std of the PE, PB, ROE, payout_ratio
     if showstats:

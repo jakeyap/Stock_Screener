@@ -88,6 +88,8 @@ def plot_full_dataset(data, title='', directory='',
         bollinger_roe_top = bollingerdata['bollinger_top']
         bollinger_roe_mid = bollingerdata['bollinger_mid']
         bollinger_roe_bot = bollingerdata['bollinger_bot']
+        print(year)
+        print(bollinger_roe_top)
         plt.plot(year,bollinger_roe_top,'--',color='red')
         plt.plot(year,bollinger_roe_mid,'--',color='red')
         plt.plot(year,bollinger_roe_bot,'--',color='red')

@@ -8,17 +8,17 @@ import main_functions_wrapper as main
 '''
 =========Key in parameters here==========
 '''
-currentprice = 58
-estimated_roe = 23
-estimated_pe = 14
-estimated_payout_ratio = 38
-dcf_rate = 17.2
-div_taxrate = 30
+currentprice = 29
+estimated_roe = 11
+estimated_pe = 10
+estimated_payout_ratio = 60
+dcf_rate = 7.
+div_taxrate = 0
 years2project = 10
-sampletitle = 'INTC_2021'
+sampletitle = 'DBS_2021'
 filename = sampletitle+'_condensed.csv'
 directory = 'sample_data/'
-std_multiplier = 2
+std_multiplier = 3
 '''
 =========END of stock parameters=========
 '''
@@ -27,7 +27,7 @@ std_multiplier = 2
 '''
 plot_1_prediction = True
 plot_sweeps = True
-bollinger_compensation = True
+bollinger_compensation = False
 '''
 =========END of plot parameters=========
 '''
@@ -35,7 +35,7 @@ bollinger_compensation = True
 if __name__ == "__main__":
     # analyze data
     if plot_1_prediction:
-        [data, stats] = main.analyze_data(directory=directory, filename=filename, title=sampletitle)
+        [data, stats] = main.analyze_data(directory=directory, filename=filename, title=sampletitle, plot=True)
         # plug in some conservative estimates
         stats = main.modify_stock_stats(stock_stats=stats,
                                         est_roe=estimated_roe,
@@ -53,10 +53,10 @@ if __name__ == "__main__":
                                  directory=directory)
     if plot_sweeps:
         sweepresolution=20
-        #hard_code_pe = {}
-        #hard_code_pe['pe_ratio_avg'] = 13
-        #hard_code_pe['pe_ratio_std'] = 1.5
-        hard_code_pe = None
+        hard_code_pe = {}
+        hard_code_pe['pe_ratio_avg'] = 10
+        hard_code_pe['pe_ratio_std'] = 1.5
+        #hard_code_pe = None
         prices = main.sweep_parameters_roe_and_pe(discount_rate=dcf_rate, 
                                                   payout_ratio=estimated_payout_ratio, 
                                                   currentprice=currentprice,
